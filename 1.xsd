@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:element name="opinions">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="opinion"/>
+      </xs:sequence>
+      <xs:attribute name="numReturned" use="required" type="xs:integer"/>
+      <xs:attribute name="start" use="required" type="xs:integer"/>
+      <xs:attribute name="totalNumFound" use="required" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="opinion">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="op_id"/>
+        <xs:element ref="sent_id"/>
+        <xs:element ref="doc_id"/>
+        <xs:element ref="doc_link"/>
+        <xs:element ref="doc_title"/>
+        <xs:element ref="dedup"/>
+        <xs:element ref="payloads"/>
+        <xs:element ref="timestamp"/>
+        <xs:element ref="publish_date"/>
+        <xs:element ref="type"/>
+        <xs:element ref="pre_sent"/>
+        <xs:element ref="sent"/>
+        <xs:element ref="post_sent"/>
+        <xs:element ref="topics"/>
+        <xs:element ref="publisher"/>
+        <xs:element ref="authors"/>
+        <xs:element ref="opholder"/>
+        <xs:element ref="oh_refs"/>
+        <xs:element ref="polarity"/>
+        <xs:element ref="polarity_conf"/>
+        <xs:element ref="regions"/>
+      </xs:sequence>
+      <xs:attribute name="index" use="required" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="op_id" type="xs:string"/>
+  <xs:element name="sent_id" type="xs:string"/>
+  <xs:element name="doc_id" type="xs:string"/>
+  <xs:element name="doc_link" type="xs:anyURI"/>
+  <xs:element name="doc_title">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="dedup" type="xs:integer"/>
+  <xs:element name="payloads">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="payload"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="payload" type="xs:string"/>
+  <xs:element name="timestamp" type="xs:NMTOKEN"/>
+  <xs:element name="publish_date" type="xs:NMTOKEN"/>
+  <xs:element name="type" type="xs:NCName"/>
+  <xs:element name="pre_sent">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="sent" type="xs:string"/>
+  <xs:element name="post_sent">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="topics">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="topic"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="topic">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:NCName">
+          <xs:attribute name="id" use="required"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="publisher">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:NCName">
+          <xs:attribute name="id" use="required"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="authors">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="author"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="author">
+    <xs:complexType>
+      <xs:attribute name="id" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="opholder">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:NCName">
+          <xs:attribute name="id" use="required"/>
+          <xs:attribute name="type" use="required"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="oh_refs">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="oh_ref"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="oh_ref" type="xs:string"/>
+  <xs:element name="polarity" type="xs:integer"/>
+  <xs:element name="polarity_conf" type="xs:decimal"/>
+  <xs:element name="regions">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="region"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="region" type="xs:string"/>
+</xs:schema>
