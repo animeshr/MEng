@@ -1,0 +1,155 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<opinions totalNumFound="8863" start="0" numReturned="5">
+<opinion index="1">
+<op_id>d42fb4e0-7d78-11e2-b710-1231390a9255</op_id>
+<sent_id>588e5ab1-0207-3b46-84be-d3cc3c3cb5e7</sent_id>
+<doc_id>
+2013-02-23-03-27-48_ae1df20a-1edd-3b30-93c9-6c9f44ca910c
+</doc_id>
+<doc_link>
+http://twitter.com/markssardella/statuses/305156981096861696
+</doc_link>
+<doc_title/>
+<dedup>0</dedup>
+<payloads>
+<payload>me	JoyceKulhawik</payload>
+<payload>me	WBZNightside</payload>
+</payloads>
+<timestamp>2013-02-23T05:23Z</timestamp>
+<publish_date>2013-02-23T03:27Z</publish_date>
+<type>tweet</type>
+<pre_sent/>
+<sent>
+Film critic @JoyceKulhawik says on @WBZNightside that #Lincoln was #BestPicture but #Argo will win #Oscar at #AcademyAwards.
+</sent>
+<post_sent/>
+<topics>
+<topic id="6a37f9d8-59fb-340f-9705-b0aea104d92d">Lincoln</topic>
+<topic id="46a4ce3a-4a94-3cac-9d6b-5c2418881b19">BestPicture</topic>
+<topic id="3870e1e4-6a68-3678-9712-0bde8736f2c1">Argo</topic>
+<topic id="48a0572e-6e7c-3c81-b428-b18da87cf613">Oscar</topic>
+<topic id="26efdd02-99ce-331c-b3d9-d9b39b81bfa6">AcademyAwards</topic>
+</topics>
+<publisher id="22dc47e0-4dd2-3d08-8f8a-5d4aa5a16dc7">Twitter</publisher>
+<authors>
+<author id="e6471ad3-3677-357d-bfeb-b7469e7d8ac3"/>
+</authors>
+<opholder id="e6471ad3-3677-357d-bfeb-b7469e7d8ac3" type="">markssardella</opholder>
+<oh_refs>
+<oh_ref>0f700043-39e3-3030-9d91-94ffff3416a3</oh_ref>
+<oh_ref>c517edf0-e70e-3fe9-bd36-be51e2cec59a</oh_ref>
+</oh_refs>
+<polarity>-1</polarity>
+<polarity_conf>0.37872037</polarity_conf>
+<regions>
+<region>North of Boston</region>
+</regions>
+</opinion>
+<opinion index="2">
+<op_id>6133ffe0-7ebe-11e2-b710-1231390a9255</op_id>
+<sent_id>201f6be9-0733-390d-9053-068ff1c387f2</sent_id>
+<doc_id>
+2013-02-24-20-11-17_bfbe5979-b700-33c5-8bd5-473c59401bd2
+</doc_id>
+<doc_link>
+http://twitter.com/TheOrangeC/statuses/305771903304478720
+</doc_link>
+<doc_title/>
+<dedup>0</dedup>
+<payloads/>
+<timestamp>2013-02-24T20:12Z</timestamp>
+<publish_date>2013-02-24T20:11Z</publish_date>
+<type>tweet</type>
+<pre_sent/>
+<sent>
+Oscar's Tonight: Rooting for Django expecting Argo. #BestPicture
+</sent>
+<post_sent/>
+<topics>
+<topic id="46a4ce3a-4a94-3cac-9d6b-5c2418881b19">BestPicture</topic>
+</topics>
+<publisher id="22dc47e0-4dd2-3d08-8f8a-5d4aa5a16dc7">Twitter</publisher>
+<authors>
+<author id="a1cf31ed-92d4-371b-8d9a-39cb5305199e"/>
+</authors>
+<opholder id="a1cf31ed-92d4-371b-8d9a-39cb5305199e" type="">TheOrangeC</opholder>
+<oh_refs/>
+<polarity>0</polarity>
+<polarity_conf>0.14140417</polarity_conf>
+<regions>
+<region/>
+</regions>
+</opinion>
+<opinion index="3">
+<op_id>43e2c050-7d6c-11e2-8ccc-123139333bc3</op_id>
+<sent_id>a33ebc3e-00ba-3435-a7e2-9e8abc3073c0</sent_id>
+<doc_id>
+2013-02-22-23-29-10_820f252d-c98e-361f-831f-d684caef74cc
+</doc_id>
+<doc_link>
+http://twitter.com/msmith_photo/statuses/305096927693918210
+</doc_link>
+<doc_title/>
+<dedup>0</dedup>
+<payloads/>
+<timestamp>2013-02-23T03:51Z</timestamp>
+<publish_date>2013-02-22T23:29Z</publish_date>
+<type>tweet</type>
+<pre_sent/>
+<sent>
+Regarding the #Oscars Best Picture nominees: Zero Dark Thirty&gt;Lincoln&gt;Amour&gt;Argo&gt;Silver Linings&gt;Les Mis&gt;Django&gt;Beasts&gt;Pi. In my opinion...
+</sent>
+<post_sent/>
+<topics>
+<topic id="5ee52026-a704-332d-b0d9-30a720348193">Oscars</topic>
+</topics>
+<publisher id="22dc47e0-4dd2-3d08-8f8a-5d4aa5a16dc7">Twitter</publisher>
+<authors>
+<author id="2718a871-1dcd-3611-a878-d660d34ebe8a"/>
+</authors>
+<opholder id="2718a871-1dcd-3611-a878-d660d34ebe8a" type="">msmith_photo</opholder>
+<oh_refs/>
+<polarity>0</polarity>
+<polarity_conf>0.19540726</polarity_conf>
+<regions>
+<region/>
+</regions>
+</opinion>
+<opinion index="4">
+<op_id>080caad0-7f08-11e2-826a-1231390b68d2</op_id>
+<sent_id>960cdaa1-d7ef-3fd8-ab8b-fadc4820a0b6</sent_id>
+<doc_id>
+2013-02-25-04-58-32_bbe09e88-bf2f-3543-b866-3d999ddaed49
+</doc_id>
+<doc_link>
+http://twitter.com/mkfood/statuses/305904591260749824
+</doc_link>
+<doc_title/>
+<dedup>0</dedup>
+<payloads/>
+<timestamp>2013-02-25T05:00Z</timestamp>
+<publish_date>2013-02-25T04:58Z</publish_date>
+<type>tweet</type>
+<pre_sent/>
+<sent>
+Congrats Ben! You deserve it!!! #Argo #Oscar #BestPicture
+</sent>
+<post_sent/>
+<topics>
+<topic id="3870e1e4-6a68-3678-9712-0bde8736f2c1">Argo</topic>
+<topic id="48a0572e-6e7c-3c81-b428-b18da87cf613">Oscar</topic>
+<topic id="46a4ce3a-4a94-3cac-9d6b-5c2418881b19">BestPicture</topic>
+</topics>
+<publisher id="22dc47e0-4dd2-3d08-8f8a-5d4aa5a16dc7">Twitter</publisher>
+<authors>
+<author id="caf525c1-783a-3af6-becf-2951f650e3c5"/>
+</authors>
+<opholder id="caf525c1-783a-3af6-becf-2951f650e3c5" type="">mkfood</opholder>
+<oh_refs/>
+<polarity>0</polarity>
+<polarity_conf>0.29894635</polarity_conf>
+<regions>
+<region/>
+</regions>
+</opinion>
+</opinions>
