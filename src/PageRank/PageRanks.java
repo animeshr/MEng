@@ -113,7 +113,8 @@ public class PageRanks {
 	 * Calculates the ranks based on the convergence criteria and populates w.
 	 */
 	public void CalculateRanks() {
-		DisplayLinkMatrix();
+		//DisplayLinkMatrix();
+		System.out.println("Number of links found:" + CountLinkMatrix());
 		NormalizeMatrix();
 		CreateMatrices();
 		UpdateWTillConvergence();
@@ -126,5 +127,15 @@ public class PageRanks {
 			}
 			System.out.println();
 		}
+	}
+	
+	public int CountLinkMatrix() {
+		int c=0;
+		for(int i = 0; i < linkMatrixSize; i++) {
+			for(int j =0; j < linkMatrixSize; j++) {
+				if(linkMatrix[i][j] >0.0) c++;
+			}
+		}
+		return c;
 	}
 }

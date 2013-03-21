@@ -9,6 +9,7 @@ import javax.xml.bind.Unmarshaller;
 
 import PageRank.BuildMentionsMatrix;
 import PageRank.PageRanks;
+import PageRank.PageRanksSparse;
 
 import com.meng.parsing.xml.OhRefs;
 import com.meng.parsing.xml.Opinion;
@@ -27,6 +28,7 @@ public class XMLParsing {
 	static HashMap<Integer, String> IDToUserFiltered = new HashMap<Integer, String>();
 	static HashMap<String, ArrayList<String>> associationsFiltered = new HashMap<String, ArrayList<String>>();
 	static int userIDs = 0;
+	static int countAssociations = 0;
 
 	XMLParsing() {
 
@@ -35,7 +37,7 @@ public class XMLParsing {
 	public static void filter() {
 		HashSet<String> usersFiltered = new HashSet<String>();
 		for (String userID : users.keySet()) {
-			if (users.get(userID) > 1) {
+			if (/* users.get(userID) > 1 */true) {
 				usersFiltered.add(userID);
 				userToIDFiltered.put(userID, userIDs);
 				IDToUserFiltered.put(userIDs, userID);
@@ -48,15 +50,14 @@ public class XMLParsing {
 			if (associations.containsKey(userID)) {
 				ArrayList<String> referencees = associations.get(userID);
 				for (String referenceesID : referencees) {
-					ArrayList<String> initial = associations.get(referenceesID);
-					for (String initialRID : initial) {
-						if (usersFiltered.contains(initialRID)) {
-							ArrayList<String> r = associationsFiltered
-									.get(referenceesID);
-							r.add(initialRID);
-							associationsFiltered.put(referenceesID, r);
-						}
+					if (usersFiltered.contains(referenceesID)) {
+						ArrayList<String> r = associationsFiltered
+								.get(userID);
+						r.add(referenceesID);
+						associationsFiltered.put(userID, r);
+						countAssociations++;
 					}
+
 				}
 			}
 		}
@@ -105,7 +106,7 @@ public class XMLParsing {
 	}
 
 	public static void readFiles() {
-		int Numfiles = 15;
+		int Numfiles = 3;
 		for (int i = 1; i <= Numfiles; i++) {
 			String filename = "data/bestpic/" + i + ".xml";
 			getOpinions(filename);
@@ -152,15 +153,16 @@ public class XMLParsing {
 		System.out.println(users.size());
 		countUsersOccuringMoreThanOnce();
 		filter();
+		System.out.println(countAssociations);
 		BuildMentionsMatrix mentionsmatrix = new BuildMentionsMatrix(
 				associationsFiltered, userToIDFiltered, IDToUserFiltered);
 		System.out.println("Debug: Size of associations:"
 				+ associationsFiltered.size());
-		PageRanks pr = new PageRanks(mentionsmatrix.mentions);
+		PageRanksSparse pr = new PageRanksSparse(mentionsmatrix.mentions);
 		pr.CalculateRanks();
 		HashMap<String, Integer> ranksOb = pr.GetRanks(userToIDFiltered,
 				IDToUserFiltered);
 		System.out.println("Success!!");
-		pr.DisplayRanks(ranksOb);
+		//pr.DisplayRanks(ranksOb);
 	}
 }
