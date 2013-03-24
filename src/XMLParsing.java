@@ -106,9 +106,9 @@ public class XMLParsing {
 	}
 
 	public static void readFiles() {
-		int Numfiles = 3;
+		int Numfiles = 63;
 		for (int i = 1; i <= Numfiles; i++) {
-			String filename = "data/bestpic/" + i + ".xml";
+			String filename = "data/googleAndroid/" + i + ".xml";
 			getOpinions(filename);
 		}
 	}
@@ -158,11 +158,16 @@ public class XMLParsing {
 				associationsFiltered, userToIDFiltered, IDToUserFiltered);
 		System.out.println("Debug: Size of associations:"
 				+ associationsFiltered.size());
+		
+		
+		
+		
 		PageRanksSparse pr = new PageRanksSparse(mentionsmatrix.mentions);
 		pr.CalculateRanks();
 		HashMap<String, Integer> ranksOb = pr.GetRanks(userToIDFiltered,
 				IDToUserFiltered);
 		System.out.println("Success!!");
-		//pr.DisplayRanks(ranksOb);
+		pr.DisplayRanks(ranksOb);
+		pr.DisplayRankStatistics(ranksOb);
 	}
 }

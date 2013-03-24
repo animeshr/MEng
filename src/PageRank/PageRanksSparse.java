@@ -1,74 +1,23 @@
 package PageRank;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.TreeMap;
 
-import net.sf.javaml.clustering.mcl.SparseMatrix;
-import net.sf.javaml.clustering.mcl.SparseVector;
 
 public class PageRanksSparse {
 	SparseMatrix linkMatrix;
-	SparseMatrix G, B;
-	SparseVector w;
+	ArrayList<Double> w;
 	int linkMatrixSize;
 	final double dampingFactor = 0.85;
 
 	public PageRanksSparse(SparseMatrix linksMatrix) {
 		linkMatrix = linksMatrix;
-		linkMatrixSize = linksMatrix.size();
+		linkMatrixSize = linksMatrix.getSize();
 		System.out.println("Size of links matrix-number of rows: "
 				+ linkMatrixSize);
 	}
 
-	SparseMatrix times(SparseMatrix A, double factor) {
-
-		/*
-		 * int c = 0; for (int i = 0; i < A.size(); i++) { for (int j = 0; j <
-		 * A.size(); j++) { if (A.get(i, j) > 0.0) System.out.print(A.get(i, j)
-		 * + " "); c++; } }
-		 */
-int co = 1;
-		System.out.println("Size of A:" + A.size());
-		for (int i = 0; i < A.size(); i++) {
-			for (int j = 0; j < A.size(); j++) {
-				co++;
-				if(co ==  A.size()* A.size()) break;
-				if (A.get(i, j) > 0.0) {
-					
-					//System.out.println(A.get(i, j));
-					A.set(i, j, (A.get(i, j) * factor));
-					//System.out.println(A.get(i, j));
-				}
-			}
-			if(co ==  A.size()* A.size()) break;
-		}
-
-		//
-		// SparseMatrix toRet = A;
-		// for (int i = 0; i < A.size(); i++) {
-		// for (int j = 0; j < A.size(); j++) {
-		// double old = A.get(i, j);
-		// if (old > 0.0) {
-		// toRet.set(i, j, (old * factor));
-		// System.out.println(old + " => " + toRet.get(i, j));
-		// }
-		// }
-		// }
-		return A;
-	}
-
-	SparseMatrix plus(SparseMatrix A, double factor) {
-		SparseMatrix toRet = A;
-		for (int i = 0; i < A.size(); i++) {
-			for (int j = 0; j < A.size(); j++) {
-				if (Double.compare(A.get(i, j), 0.0) != 0.0) {
-					toRet.add(i, j, A.get(i, j) + factor);
-				} else {
-					toRet.add(i, j, factor);
-				}
-			}
-		}
-		return toRet;
-	}
 
 	/*
 	 * Creating the matrices for the page rank algorithm:
@@ -80,14 +29,13 @@ int co = 1;
 		/*
 		 * Create B
 		 */
-		B = linkMatrix;
-		B = times(B, dampingFactor);
-		G = plus(B, (1 - dampingFactor) / linkMatrix.size());
+		linkMatrix.matrixtimes(dampingFactor);
+		linkMatrix.matrixAdd((1 - dampingFactor) / linkMatrix.getSize());
 		/*
 		 * Create w
 		 */
-		w = new SparseVector();
-		for (int i = 0; i < linkMatrix.size(); i++) {
+		w = new ArrayList<Double>();
+		for (int i = 0; i < linkMatrix.getSize(); i++) {
 			w.add(i, 1.0);
 		}
 	}
@@ -96,10 +44,10 @@ int co = 1;
 	 * This is to compare the Matrices. The precision used is 10^-6 for the cell
 	 * values.
 	 */
-	public boolean MatrixEquals(SparseVector A, SparseVector B) {
-		for (int i = 0; i < A.getLength(); i++) {
+	public boolean MatrixEquals(ArrayList<Double> A, ArrayList<Double> B) {
+		for (int i = 0; i < A.size(); i++) {
 			// System.out.println(A.get(i) + " " + B.get(i));
-			if (Math.abs(A.get(i) - B.get(i)) > 0.001) {
+			if (Math.abs(A.get(i) - B.get(i)) > 0.000001) {
 				return false;
 			}
 		}
@@ -111,20 +59,19 @@ int co = 1;
 	 */
 	public void UpdateWTillConvergence() {
 		int iterations = 0;
-		SparseVector wi = w.copy();
-		w = G.times(wi);
-		/*
-		 * for (int i = 0; i < w.getLength(); i++) { System.out.println(w.get(i)
-		 * + " " + wi.get(i)); }
-		 */
+		ArrayList<Double> wi = new ArrayList<Double>(w);
+		w = linkMatrix.times(wi);
+
 		while (!MatrixEquals(w, wi)) {
-			wi = w.copy();
-			w = G.times(wi);
+			wi = new ArrayList<Double>(w);
+			w = linkMatrix.times(wi);
 			iterations++;
 		}
 		System.out.println("Debug: Number of iterations run by Page Rank: "
 				+ iterations);
-		// PrintMatrix(w);
+		/*for(int i=0;i<w.size(); i++){
+			System.out.println(w.get(i));
+		}*/
 	}
 
 	/*
@@ -156,15 +103,32 @@ int co = 1;
 		}
 	}
 
+	public void DisplayRankStatistics(HashMap<String, Integer> UserToRanks) {
+		System.out.println("Stats about Ranks");
+		TreeMap<Integer, Integer> freqs = new TreeMap<Integer, Integer>();
+		for(String id:UserToRanks.keySet()){
+			Integer rank = UserToRanks.get(id);
+			if(freqs.containsKey(rank)){
+				Integer old = freqs.get(rank);
+				freqs.put(rank, old+1);
+			} else {
+				freqs.put(rank, new Integer(1));
+			}
+		}
+		for(Integer rank: freqs.keySet()){
+			System.out.println("Rank: " + rank + " => " + freqs.get(rank));
+		}
+	}
+	
 	/*
 	 * Calculates the ranks based on the convergence criteria and populates w.
 	 */
 	public void CalculateRanks() {
 
-		 //System.out.println("Number of links found:" + CountLinkMatrix());
+		System.out.println("Number of links found:" + linkMatrix.count());
 		// NormalizeMatrix();
 		CreateMatrices();
-		//UpdateWTillConvergence();
+		UpdateWTillConvergence();
 	}
 
 	public void DisplayLinkMatrix() {
@@ -176,15 +140,4 @@ int co = 1;
 		}
 	}
 
-	public int CountLinkMatrix() {
-		int c = 0;
-		for (int i = 0; i < linkMatrixSize; i++) {
-			for (int j = 0; j < linkMatrixSize; j++) {
-				if (linkMatrix.get(i, j) > 0.0)
-					System.out.println(linkMatrix.get(i, j) + " @ " + i + " " + j);
-				c++;
-			}
-		}
-		return c;
-	}
 }
