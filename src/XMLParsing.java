@@ -9,6 +9,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import PageRank.BuildMentionsMatrix;
 import PageRank.PageRanksSparse;
+import Temporal.BuildTemporalMatrix;
+
 import com.meng.parsing.xml.OhRefs;
 import com.meng.parsing.xml.Opinion;
 import com.meng.parsing.xml.Opinions;
@@ -219,9 +221,9 @@ public class XMLParsing {
 	}
 
 	public void readFiles() {
-		int Numfiles = 15;
+		int Numfiles = 63;
 		for (int i = 1; i <= Numfiles; i++) {
-			String filename = "data/bestpic/" + i + ".xml";
+			String filename = "data/googleAndroid/" + i + ".xml";
 			getOpinions(filename);
 		}
 	}
@@ -295,7 +297,7 @@ public class XMLParsing {
 		System.out.println(temporal.associationsTemporal.size());
 		
 		// Printing Paths
-		int visited[] = new int[1000000];
+		/*int visited[] = new int[1000000];
 		for(int i = 0 ; i < 100000; i ++ ){
 			visited[i] = 0;
 		}
@@ -304,9 +306,10 @@ public class XMLParsing {
 				visited[i] = 0;
 			}
 			temporal.printPaths(ii, 0, visited);
-		}
-
-		/*BuildMentionsMatrix mentionsmatrix = new BuildMentionsMatrix(
+		}*/
+		
+		if(!TEMPORAL){
+		BuildMentionsMatrix mentionsmatrix = new BuildMentionsMatrix(
 				temporal.associations, temporal.userToIDFiltered,
 				temporal.IDToUserFiltered);
 		System.out.println("Debug: Size of associations:"
@@ -318,8 +321,21 @@ public class XMLParsing {
 				temporal.userToIDFiltered, temporal.IDToUserFiltered);
 		System.out.println("Success!!");
 		pr.DisplayRanks(ranksOb);
-		pr.DisplayRankStatistics(ranksOb);*/
-		
+		pr.DisplayRankStatistics(ranksOb);
+		} else {
+			BuildTemporalMatrix temporalMatrix = new BuildTemporalMatrix(
+					temporal.associationsTemporal, temporal.users.size());
+			System.out.println("Debug: Size of associations:"
+					+ temporal.associationsTemporal.size());
+
+			PageRanksSparse pr = new PageRanksSparse(temporalMatrix.temporalMatrix);
+			pr.CalculateRanks();
+			HashMap<String, Integer> ranksOb = pr.GetRanks(
+					temporal.userToIDFiltered, temporal.IDToUserFiltered);
+			System.out.println("Success!!");
+			pr.DisplayRanks(ranksOb);
+			pr.DisplayRankStatistics(ranksOb);
+		}
 
 	}
 }
