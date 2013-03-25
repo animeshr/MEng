@@ -134,6 +134,13 @@ public class XMLParsing {
 				ArrayList<String> referencees = new ArrayList<String>();
 				associations.put(opinionHolderID, referencees);
 			}
+			
+			if (!associationsTemporal.containsKey(userToIDFiltered
+					.get(opinionHolderID))) {
+				HashMap<Integer, ArrayList<Double>> refs = new HashMap<Integer, ArrayList<Double>>();
+				associationsTemporal.put(
+						userToIDFiltered.get(opinionHolderID), refs);
+			}
 		} else {
 			users.put(opinionHolderID, users.get(opinionHolderID) + 1);
 		}
@@ -154,12 +161,21 @@ public class XMLParsing {
 			}
 
 			if (TEMPORAL) {
+				
+				if (!associationsTemporal.containsKey(userToIDFiltered
+						.get(referenceeID))) {
+					HashMap<Integer, ArrayList<Double>> refs = new HashMap<Integer, ArrayList<Double>>();
+					associationsTemporal.put(
+							userToIDFiltered.get(referenceeID), refs);
+				}
+				
 				if (!associationsTemporal.containsKey(userToIDFiltered
 						.get(opinionHolderID))) {
 					HashMap<Integer, ArrayList<Double>> refs = new HashMap<Integer, ArrayList<Double>>();
 					associationsTemporal.put(
 							userToIDFiltered.get(opinionHolderID), refs);
 				}
+				
 				HashMap<Integer, ArrayList<Double>> refs = associationsTemporal
 						.get(userToIDFiltered.get(opinionHolderID));
 
@@ -170,7 +186,7 @@ public class XMLParsing {
 
 				ArrayList<Double> timestamps = refs.get(userToIDFiltered
 						.get(referenceeID));
-
+			
 				timestamps.add(getTime(timestamp));
 
 				refs.put(userToIDFiltered.get(referenceeID), timestamps);
@@ -244,16 +260,53 @@ public class XMLParsing {
 		System.out.println("Maximum Occurances of User with ID " + newId
 				+ " is " + max);
 	}
+	
+	int a[] = new int [1000000];
+	public void printPaths(Integer node, int index, int visited[]) {
+		//System.out.println("Index is " + index + " and node is " + node);
+		HashMap<Integer, ArrayList<Double>> rr = associationsTemporal.get(node);
+		if(!associationsTemporal.containsKey(node) || visited[node] == 1 || rr.size() == 0) {
+			if(index == 0) {
+				return;
+			}
+			a[index] = node;
+			for(int i = 0; i <= index ;i++ ) {
+				System.out.print(a[i] + " -> " );
+			}
+			System.out.println();
+			return;
+		}
+		//System.out.print("here" );
+		a[index] = node;
+		visited[node] = 1;
+		
+		for(Integer nn : rr.keySet()) {
+			printPaths(nn, index + 1, visited);
+		}
+	}
 
 	public static void main(String[] args) {
 
-		TEMPORAL = false;
+		TEMPORAL = true;
 		XMLParsing temporal = new XMLParsing(TEMPORAL);
 		temporal.readFiles();
 		temporal.countUsersOccuringMoreThanOnce();
 		System.out.println(temporal.countAssociations);
+		System.out.println(temporal.associationsTemporal.size());
+		
+		// Printing Paths
+		int visited[] = new int[1000000];
+		for(int i = 0 ; i < 100000; i ++ ){
+			visited[i] = 0;
+		}
+		for(Integer ii : temporal.associationsTemporal.keySet()) {
+			for(int i = 0 ; i < 100000; i ++ ){
+				visited[i] = 0;
+			}
+			temporal.printPaths(ii, 0, visited);
+		}
 
-		BuildMentionsMatrix mentionsmatrix = new BuildMentionsMatrix(
+		/*BuildMentionsMatrix mentionsmatrix = new BuildMentionsMatrix(
 				temporal.associations, temporal.userToIDFiltered,
 				temporal.IDToUserFiltered);
 		System.out.println("Debug: Size of associations:"
@@ -265,7 +318,8 @@ public class XMLParsing {
 				temporal.userToIDFiltered, temporal.IDToUserFiltered);
 		System.out.println("Success!!");
 		pr.DisplayRanks(ranksOb);
-		pr.DisplayRankStatistics(ranksOb);
+		pr.DisplayRankStatistics(ranksOb);*/
+		
 
 	}
 }
