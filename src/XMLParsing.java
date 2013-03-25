@@ -1,95 +1,114 @@
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
-
 import PageRank.BuildMentionsMatrix;
-import PageRank.PageRanks;
 import PageRank.PageRanksSparse;
-
 import com.meng.parsing.xml.OhRefs;
 import com.meng.parsing.xml.Opinion;
 import com.meng.parsing.xml.Opinions;
 
 public class XMLParsing {
 
-	static HashMap<String, Integer> users = new HashMap<String, Integer>();
-	// static HashMap<String, Integer> userToID = new HashMap<String,
-	// Integer>();
-	// static HashMap<Integer, String> IDToUser = new HashMap<Integer,
-	// String>();
-	static HashMap<String, ArrayList<String>> associations = new HashMap<String, ArrayList<String>>();
+	HashMap<String, Integer> users;
+	HashMap<String, ArrayList<String>> associations;
+	HashMap<String, Integer> userToIDFiltered;
+	HashMap<Integer, String> IDToUserFiltered;
+	int userIDs;
+	int countAssociations;
+	static boolean TEMPORAL = false;
 
-	static HashMap<String, Integer> userToIDFiltered = new HashMap<String, Integer>();
-	static HashMap<Integer, String> IDToUserFiltered = new HashMap<Integer, String>();
-	static HashMap<String, ArrayList<String>> associationsFiltered = new HashMap<String, ArrayList<String>>();
-	static int userIDs = 0;
-	static int countAssociations = 0;
+	HashMap<Integer, HashMap<Integer, ArrayList<Double>>> associationsTemporal;
 
-	XMLParsing() {
-
+	XMLParsing(Boolean isTemporal) {
+		users = new HashMap<String, Integer>();
+		userToIDFiltered = new HashMap<String, Integer>();
+		IDToUserFiltered = new HashMap<Integer, String>();
+		userIDs = 0;
+		countAssociations = 0;
+		if (isTemporal) {
+			associationsTemporal = new HashMap<Integer, HashMap<Integer, ArrayList<Double>>>();
+		} else {
+			associations = new HashMap<String, ArrayList<String>>();
+		}
 	}
 
-	public static void filter() {
-		HashSet<String> usersFiltered = new HashSet<String>();
+	public void addUsersWithoutAnyMentions() {
 		for (String userID : users.keySet()) {
-			if (/* users.get(userID) > 1 */true) {
-				usersFiltered.add(userID);
-				userToIDFiltered.put(userID, userIDs);
-				IDToUserFiltered.put(userIDs, userID);
-				userIDs = userIDs + 1;
-				associationsFiltered.put(userID, new ArrayList<String>());
-			}
-		}
-
-		for (String userID : usersFiltered) {
-			if (associations.containsKey(userID)) {
-				ArrayList<String> referencees = associations.get(userID);
-				for (String referenceesID : referencees) {
-					if (usersFiltered.contains(referenceesID)) {
-						ArrayList<String> r = associationsFiltered
-								.get(userID);
-						r.add(referenceesID);
-						associationsFiltered.put(userID, r);
-						countAssociations++;
-					}
-
-				}
+			if (!associations.containsKey(userID)) {
+				associations.put(userID, new ArrayList<String>());
 			}
 		}
 	}
 
-	public static void parseOpinion(Opinion opinion) {
+	public void parseOpinion(Opinion opinion) {
 		String opinionHolderID = opinion.getOpId();
+		String timestamp = opinion.getTimestamp();
 		if (!users.containsKey(opinionHolderID)) {
 			users.put(opinionHolderID, 1);
-			ArrayList<String> referencees = new ArrayList<String>();
-			associations.put(opinionHolderID, referencees);
-
+			userToIDFiltered.put(opinionHolderID, userIDs);
+			IDToUserFiltered.put(userIDs, opinionHolderID);
+			userIDs = userIDs + 1;
+			if (!TEMPORAL) {
+				ArrayList<String> referencees = new ArrayList<String>();
+				associations.put(opinionHolderID, referencees);
+			}
 		} else {
 			users.put(opinionHolderID, users.get(opinionHolderID) + 1);
 		}
 		OhRefs references = opinion.getOhRefs();
 		List<String> referencees = references.getOhRef();
 		for (String referenceeID : referencees) {
+			countAssociations++;
 			if (!users.containsKey(referenceeID)) {
 				users.put(referenceeID, 1);
+				userToIDFiltered.put(referenceeID, userIDs);
+				IDToUserFiltered.put(userIDs, referenceeID);
+				userIDs = userIDs + 1;
+				if (!TEMPORAL) {
+					associations.put(referenceeID, new ArrayList<String>());
+				}
 			} else {
 				users.put(referenceeID, users.get(referenceeID) + 1);
 			}
 
-			ArrayList<String> referenceesList = associations
-					.get(opinionHolderID);
-			referenceesList.add(referenceeID);
-			associations.put(opinionHolderID, referenceesList);
+			if (TEMPORAL) {
+				if (!associationsTemporal.containsKey(userToIDFiltered
+						.get(opinionHolderID))) {
+					HashMap<Integer, ArrayList<Double>> refs = new HashMap<Integer, ArrayList<Double>>();
+					associationsTemporal.put(
+							userToIDFiltered.get(opinionHolderID), refs);
+				}
+				HashMap<Integer, ArrayList<Double>> refs = associationsTemporal
+						.get(userToIDFiltered.get(opinionHolderID));
+
+				if (!refs.containsKey(userToIDFiltered.get(referenceeID))) {
+					refs.put(userToIDFiltered.get(referenceeID),
+							new ArrayList<Double>());
+				}
+
+				ArrayList<Double> timestamps = refs.get(userToIDFiltered
+						.get(referenceeID));
+
+				/* TODO: Convert string timestamp to epoch time */
+				timestamps.add(1.0);
+
+				refs.put(userToIDFiltered.get(referenceeID), timestamps);
+				associationsTemporal.put(userToIDFiltered.get(opinionHolderID),
+						refs);
+			} else {
+
+				ArrayList<String> referenceesList = associations
+						.get(opinionHolderID);
+				referenceesList.add(referenceeID);
+				associations.put(opinionHolderID, referenceesList);
+			}
 		}
 	}
 
-	public static void getOpinions(String filename) {
+	public void getOpinions(String filename) {
 		try {
 			JAXBContext jc = JAXBContext.newInstance("com.meng.parsing.xml");
 			Unmarshaller unmarshaller = jc.createUnmarshaller();
@@ -105,7 +124,7 @@ public class XMLParsing {
 		}
 	}
 
-	public static void readFiles() {
+	public void readFiles() {
 		int Numfiles = 15;
 		for (int i = 1; i <= Numfiles; i++) {
 			String filename = "data/bestpic/" + i + ".xml";
@@ -113,7 +132,7 @@ public class XMLParsing {
 		}
 	}
 
-	public static void test() {
+	public void test() {
 		try {
 			JAXBContext jc = JAXBContext.newInstance("com.meng.parsing.xml");
 			Unmarshaller unmarshaller = jc.createUnmarshaller();
@@ -131,7 +150,7 @@ public class XMLParsing {
 		}
 	}
 
-	public static void countUsersOccuringMoreThanOnce() {
+	public void countUsersOccuringMoreThanOnce() {
 		int count = 0, max = Integer.MIN_VALUE;
 		String newId = null;
 		for (String userID : users.keySet()) {
@@ -149,23 +168,23 @@ public class XMLParsing {
 	}
 
 	public static void main(String[] args) {
-		readFiles();
-		System.out.println(users.size());
-		countUsersOccuringMoreThanOnce();
-		filter();
-		System.out.println(countAssociations);
+
+		TEMPORAL = false;
+		XMLParsing temporal = new XMLParsing(TEMPORAL);
+		temporal.readFiles();
+		temporal.countUsersOccuringMoreThanOnce();
+		System.out.println(temporal.countAssociations);
+
 		BuildMentionsMatrix mentionsmatrix = new BuildMentionsMatrix(
-				associationsFiltered, userToIDFiltered, IDToUserFiltered);
+				temporal.associations, temporal.userToIDFiltered,
+				temporal.IDToUserFiltered);
 		System.out.println("Debug: Size of associations:"
-				+ associationsFiltered.size());
-		
-		
-		
-		
+				+ temporal.associations.size());
+
 		PageRanksSparse pr = new PageRanksSparse(mentionsmatrix.mentions);
 		pr.CalculateRanks();
-		HashMap<String, Integer> ranksOb = pr.GetRanks(userToIDFiltered,
-				IDToUserFiltered);
+		HashMap<String, Integer> ranksOb = pr.GetRanks(
+				temporal.userToIDFiltered, temporal.IDToUserFiltered);
 		System.out.println("Success!!");
 		pr.DisplayRanks(ranksOb);
 		pr.DisplayRankStatistics(ranksOb);
