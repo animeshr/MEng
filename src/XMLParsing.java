@@ -106,9 +106,9 @@ public class XMLParsing {
 	}
 
 	public static void readFiles() {
-		int Numfiles = 63;
+		int Numfiles = 15;
 		for (int i = 1; i <= Numfiles; i++) {
-			String filename = "data/googleAndroid/" + i + ".xml";
+			String filename = "data/bestpic/" + i + ".xml";
 			getOpinions(filename);
 		}
 	}

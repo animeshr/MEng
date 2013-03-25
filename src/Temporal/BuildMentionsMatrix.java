@@ -1,7 +1,9 @@
-package PageRank;
+package Temporal;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import PageRank.SparseMatrix;
 
 public class BuildMentionsMatrix {
 	HashMap<String, Integer> userToID;
@@ -9,7 +11,6 @@ public class BuildMentionsMatrix {
 	int SIZE;
 	public double mentionsArr[][];
 	public SparseMatrix mentions;
-
 	
 	public BuildMentionsMatrix(HashMap<String, ArrayList<String>> associations,
 			HashMap<String, Integer> userToID, HashMap<Integer, String> IDToUser) {
@@ -22,15 +23,6 @@ public class BuildMentionsMatrix {
 	}
 
 	public void constructLinkMatrix(
-			HashMap<String, ArrayList<String>> associations) {
-
-		double count=0;
-		for (String userID : associations.keySet()) {
-			ArrayList<String> mentionedIDs = associations.get(userID);
-			for (String mentionedID : mentionedIDs) {				
-				mentions.increment(userToID.get(mentionedID), userToID.get(userID));
-			}
-		}
-		
+			HashMap<String, ArrayList<String>> associations) {		
 	}
 }
