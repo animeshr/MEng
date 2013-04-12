@@ -225,7 +225,6 @@ public class XMLParsing {
 		int Numfiles = 15;
 		for (int i = 1; i <= Numfiles; i++) {
 			String filename = "data/bestpic/" + i + ".xml";
-			//String filename = "2.xml";
 			getOpinions(filename);
 		}
 	}
@@ -301,7 +300,7 @@ public class XMLParsing {
 		System.out.println(temporal.associationsTemporal.size());
 
 		// Printing Paths
-		int visited[] = new int[1000000];
+		/*int visited[] = new int[1000000];
 		for (int i = 0; i < 100000; i++) {
 			visited[i] = 0;
 		}
@@ -310,7 +309,7 @@ public class XMLParsing {
 				visited[i] = 0;
 			}
 			temporal.printPaths(ii, 0, visited);
-		}
+		}*/
 
 		if (!TEMPORAL) {
 			BuildMentionsMatrix mentionsmatrix = new BuildMentionsMatrix(
@@ -338,7 +337,7 @@ public class XMLParsing {
 			HashMap<String, Integer> ranksOb = pr.GetRanks(
 					temporal.userToIDFiltered, temporal.IDToUserFiltered);
 			System.out.println("Success!!");
-			pr.DisplayRanks(ranksOb);
+			//pr.DisplayRanks(ranksOb);
 			pr.DisplayRankStatistics(ranksOb);
 		}
 

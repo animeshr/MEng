@@ -19,6 +19,9 @@ public class PageRanksSparse {
 	}
 
 
+	public void NormalizeMatrix(){
+		linkMatrix.NormalizeMatrix();
+	}
 	/*
 	 * Creating the matrices for the page rank algorithm:
 	 * 
@@ -45,12 +48,15 @@ public class PageRanksSparse {
 	 * values.
 	 */
 	public boolean MatrixEquals(ArrayList<Double> A, ArrayList<Double> B) {
+		double count = 0, total = 0;
 		for (int i = 0; i < A.size(); i++) {
-			// System.out.println(A.get(i) + " " + B.get(i));
+			total++;
+			//System.out.println(A.get(i) + " " + B.get(i));
 			if (Math.abs(A.get(i) - B.get(i)) > 0.000001) {
-				return false;
+				count++;
 			}
 		}
+		if(count/total > 0.1) { System.out.println("disp " + (count/total)); return false; }
 		return true;
 	}
 
@@ -66,6 +72,7 @@ public class PageRanksSparse {
 			wi = new ArrayList<Double>(w);
 			w = linkMatrix.times(wi);
 			iterations++;
+			System.out.println("Iteration.." + iterations + "done");
 		}
 		System.out.println("Debug: Number of iterations run by Page Rank: "
 				+ iterations);
@@ -124,9 +131,8 @@ public class PageRanksSparse {
 	 * Calculates the ranks based on the convergence criteria and populates w.
 	 */
 	public void CalculateRanks() {
-
+		NormalizeMatrix();
 		System.out.println("Number of links found:" + linkMatrix.count());
-		// NormalizeMatrix();
 		CreateMatrices();
 		UpdateWTillConvergence();
 	}

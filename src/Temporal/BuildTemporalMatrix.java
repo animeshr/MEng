@@ -41,7 +41,7 @@ public class BuildTemporalMatrix {
 				temporalMatrix.insert(influencer,influencee,influencers.get(influencer).size());
 			}
 		}
-		
+		int linksFound = 0;
 		for(Integer influencee: temporalLinks.keySet()){
 			Integer currentInfluencee = influencee;
 			Double factor = 1.0;
@@ -67,22 +67,23 @@ public class BuildTemporalMatrix {
 									// for each time in the mentions labels
 									HashMap<Integer, ArrayList<Double>> transitiveInfluencers = temporalLinks.get(influencer);
 									if(transitiveInfluencers != null){
-										System.out.println(transitiveInfluencers.size());
+										//System.out.println("Size of trans Influencers"+ transitiveInfluencers.size());
 										for(Integer transInfluencer:transitiveInfluencers.keySet()){
 											ArrayList<Double> transTimeStamps = transitiveInfluencers.get(transInfluencer);
 											Double transDelay = GetDelay(transTimeStamps, timesofMentionsPrimary);
 											if(transDelay != null){
-												System.out.println(transDelay);
+												//System.out.println("Debug: trans delay = " + transDelay);
 												Double val = temporalMatrix.get(influencer, transInfluencer);
 												if(val!= null){
-													temporalMatrix.insert(transInfluencer,influencer, val + factor/transDelay);
+													temporalMatrix.insert(transInfluencer,influencer, val + factor/transDelay); // divide by transdelay
 												} else {
 													temporalMatrix.insert(transInfluencer,influencer, factor/transDelay);
 												}
+												linksFound++;
 											}
 										}
 									}else {
-										//System.out.println("Fuck this!");
+										//System.out.println("no trans influencers!");
 									}
 								}
 							}
@@ -93,5 +94,6 @@ public class BuildTemporalMatrix {
 				influencers = new LinkedList<Integer>();
 			}
 		}
+		System.out.println("Number of links Found: " + linksFound);
 	}
 }

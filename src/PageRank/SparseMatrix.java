@@ -14,6 +14,29 @@ public class SparseMatrix {
 		normalizedValue = 0.0;
 	}
 	
+	public void NormalizeMatrix() {
+		HashMap<Integer, Double> freqs= new HashMap<Integer, Double>();
+		for (Integer i = 0; i < size; i++){
+			Double sum= 0.0;
+			for(Integer k1: matrix.keySet()){
+				HashMap<Integer, Double> inner = matrix.get(k1);
+				if(inner.containsKey(i)){
+					sum += inner.get(i);
+				}
+			}
+			if(sum != 0.0){
+				for(Integer k1: matrix.keySet()){
+					HashMap<Integer, Double> inner = matrix.get(k1);
+					if(inner.containsKey(i)){
+						Double newS = inner.get(i);
+						inner.put(i, newS/sum);
+					}
+				}
+			}
+		}
+		
+	}
+	
 	public int getSize() {
 		return size;
 	}
