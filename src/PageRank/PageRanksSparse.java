@@ -10,6 +10,7 @@ public class PageRanksSparse {
 	ArrayList<Double> w;
 	int linkMatrixSize;
 	final double dampingFactor = 0.85;
+	public static final int Iterations = 5;
 
 	public PageRanksSparse(SparseMatrix linksMatrix) {
 		linkMatrix = linksMatrix;
@@ -67,8 +68,7 @@ public class PageRanksSparse {
 		int iterations = 0;
 		ArrayList<Double> wi = new ArrayList<Double>(w);
 		w = linkMatrix.times(wi);
-
-		while (!MatrixEquals(w, wi)) {
+		while (!MatrixEquals(w, wi) && iterations < Iterations) {
 			wi = new ArrayList<Double>(w);
 			w = linkMatrix.times(wi);
 			iterations++;
