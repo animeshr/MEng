@@ -291,8 +291,6 @@ public class XMLParsing {
 	}
 
 	public static void main(String[] args) {
-
-		TEMPORAL = false;
 		XMLParsing temporal = new XMLParsing(TEMPORAL);
 		temporal.readFiles();
 		temporal.countUsersOccuringMoreThanOnce();
