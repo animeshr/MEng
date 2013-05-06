@@ -104,9 +104,21 @@ public class PageRanksSparse {
 	}
 
 	public void DisplayRanks(HashMap<String, Integer> UserToRanks) {
-		System.out.println("Ranks");
-		for (String userID : UserToRanks.keySet()) {
-			System.out.println(userID + " : " + UserToRanks.get(userID));
+		System.out.println("Ranks: Top 10 users");
+		TreeMap<Integer, String> rankswithUsers = new TreeMap<Integer, String>();
+		int overallrank=1;
+		for(int ra = 1; ra<=10; ra++){
+			for (String userID : UserToRanks.keySet()) {
+				Integer rank = UserToRanks.get(userID);
+				if(rank == ra){
+					rankswithUsers.put(new Integer(overallrank++), userID);
+				}
+			}
+		}
+		int c=0;
+		for(Integer k: rankswithUsers.keySet()){
+			System.out.println("Rank: " + k + ", user:" + rankswithUsers.get(k));
+			if(c++ >= 10) return;
 		}
 	}
 
@@ -131,7 +143,7 @@ public class PageRanksSparse {
 	 * Calculates the ranks based on the convergence criteria and populates w.
 	 */
 	public void CalculateRanks() {
-		NormalizeMatrix();
+		//NormalizeMatrix();
 		System.out.println("Number of links found:" + linkMatrix.count());
 		CreateMatrices();
 		UpdateWTillConvergence();

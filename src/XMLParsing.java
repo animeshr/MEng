@@ -23,7 +23,7 @@ public class XMLParsing {
 	HashMap<Integer, String> IDToUserFiltered;
 	int userIDs;
 	int countAssociations;
-	static boolean TEMPORAL = false;
+	static boolean TEMPORAL = true;
 
 	HashMap<Integer, HashMap<Integer, ArrayList<Double>>> associationsTemporal;
 
@@ -292,12 +292,12 @@ public class XMLParsing {
 
 	public static void main(String[] args) {
 
-		TEMPORAL = true;
+		TEMPORAL = false;
 		XMLParsing temporal = new XMLParsing(TEMPORAL);
 		temporal.readFiles();
 		temporal.countUsersOccuringMoreThanOnce();
 		System.out.println(temporal.countAssociations);
-		System.out.println(temporal.associationsTemporal.size());
+		//System.out.println(temporal.associationsTemporal.size());
 
 		// Printing Paths
 		/*int visited[] = new int[1000000];
@@ -337,7 +337,7 @@ public class XMLParsing {
 			HashMap<String, Integer> ranksOb = pr.GetRanks(
 					temporal.userToIDFiltered, temporal.IDToUserFiltered);
 			System.out.println("Success!!");
-			//pr.DisplayRanks(ranksOb);
+			pr.DisplayRanks(ranksOb);
 			pr.DisplayRankStatistics(ranksOb);
 		}
 
