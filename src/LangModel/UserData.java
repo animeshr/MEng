@@ -5,15 +5,15 @@ import java.util.TreeMap;
 public class UserData {
 	String userID;
 	Integer rank;
-	TreeMap<Long, String> tweets;
+	TreeMap<Double, String> tweets;
 
 	public UserData(String userID, Integer rank) {
 		this.userID = userID;
 		this.rank = rank;
-		this.tweets = new TreeMap<Long, String>();
+		this.tweets = new TreeMap<Double, String>();
 	}
 
-	public void AddTweet(Long timestamp, String tweet) {
+	public void AddTweet(Double timestamp, String tweet) {
 		tweets.put(timestamp, tweet);
 	}
 }

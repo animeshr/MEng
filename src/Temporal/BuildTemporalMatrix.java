@@ -55,8 +55,7 @@ public class BuildTemporalMatrix {
 			Queue<Integer> influencers = new LinkedList<Integer>();
 			HashSet<Integer> visited = new HashSet<Integer>();
 			influencees.add(currentInfluencee);
-			Double currentdelta = new Double(delta);
-
+			
 			for (; currentLevel <= 3; currentLevel++) { // factor*=0.8
 				while (influencees.size() > 0) {
 					currentInfluencee = influencees.poll();
