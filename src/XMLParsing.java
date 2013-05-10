@@ -24,45 +24,31 @@ import com.meng.parsing.xml.Opinions;
 public class XMLParsing {
 
 	HashMap<String, Integer> users;
-	HashMap<String, Integer> usersValidation;
 	HashMap<String, ArrayList<String>> associations;
-	HashMap<String, ArrayList<String>> associationsValidation;
 	HashMap<String, Integer> userToIDFiltered;
 	HashMap<Integer, String> IDToUserFiltered;
-	HashMap<String, Integer> userToIDFilteredValidation;
-	HashMap<Integer, String> IDToUserFilteredValidation;
 	ArrayList<Double> timestamps;
-	ArrayList<String> validationUserTweets;
+	HashMap<String, ArrayList<String>> validationUserTweets;
 	int userIDs;
 	int countAssociations;
-	int userIDsValidation;
-	int countAssociationsValidation;
 	double timestampSplit;
 	static boolean TEMPORAL = false;
-	
+
 	HashMap<Integer, HashMap<Integer, ArrayList<Double>>> associationsTemporal;
-	HashMap<Integer, HashMap<Integer, ArrayList<Double>>> associationsTemporalValidation;
-	
+
 	XMLParsing(Boolean isTemporal) {
 		users = new HashMap<String, Integer>();
-		usersValidation = new HashMap<String, Integer>();
 		userToIDFiltered = new HashMap<String, Integer>();
 		IDToUserFiltered = new HashMap<Integer, String>();
-		userToIDFilteredValidation = new HashMap<String, Integer>();
-		IDToUserFilteredValidation = new HashMap<Integer, String>();
 		timestamps = new ArrayList<Double>();
-		validationUserTweets = new ArrayList<String>();
+		validationUserTweets = new HashMap<String, ArrayList<String>>();
 		userIDs = 0;
 		countAssociations = 0;
-		userIDsValidation = 0;
 		timestampSplit = -1.0;
-		countAssociationsValidation = 0;
 		if (isTemporal) {
 			associationsTemporal = new HashMap<Integer, HashMap<Integer, ArrayList<Double>>>();
-			associationsTemporalValidation = new HashMap<Integer, HashMap<Integer, ArrayList<Double>>>();
 		} else {
 			associations = new HashMap<String, ArrayList<String>>();
-			associationsValidation = new HashMap<String, ArrayList<String>>();
 		}
 	}
 
@@ -152,93 +138,14 @@ public class XMLParsing {
 
 	public void parseOpinionValidtion(Opinion opinion, String opinionHolderID) {
 
-		Double timestamp = getTime(opinion.getTimestamp());
-		validationUserTweets.add(opinion.getSent());
-
-		if (!usersValidation.containsKey(opinionHolderID)) {
-			usersValidation.put(opinionHolderID, 1);
-			userToIDFilteredValidation.put(opinionHolderID, userIDsValidation);
-			IDToUserFilteredValidation.put(userIDsValidation, opinionHolderID);
-			userIDsValidation = userIDsValidation + 1;
-			if (!TEMPORAL) {
-				ArrayList<String> referencees = new ArrayList<String>();
-				associationsValidation.put(opinionHolderID, referencees);
-			}
-
-			/*
-			 * if (!associationsTemporal.containsKey(userToIDFiltered
-			 * .get(opinionHolderID))) { HashMap<Integer, ArrayList<Double>>
-			 * refs = new HashMap<Integer, ArrayList<Double>>();
-			 * associationsTemporal.put(userToIDFiltered.get(opinionHolderID),
-			 * refs); }
-			 */
-		} else {
-			usersValidation.put(opinionHolderID,
-					usersValidation.get(opinionHolderID) + 1);
+		if (!validationUserTweets.containsKey(opinionHolderID)) {
+			ArrayList<String> userTweets = new ArrayList<String>();
+			validationUserTweets.put(opinionHolderID, userTweets);
 		}
-		OhRefs references = opinion.getOhRefs();
-		List<String> referencees = references.getOhRef();
-		for (String referenceeID : referencees) {
-			countAssociationsValidation++;
-			if (!usersValidation.containsKey(referenceeID)) {
-				usersValidation.put(referenceeID, 1);
-				userToIDFilteredValidation.put(referenceeID, userIDsValidation);
-				IDToUserFilteredValidation.put(userIDsValidation, referenceeID);
-				userIDsValidation = userIDsValidation + 1;
-				if (!TEMPORAL) {
-					associationsValidation.put(referenceeID,
-							new ArrayList<String>());
-				}
-			} else {
-				usersValidation.put(referenceeID,
-						usersValidation.get(referenceeID) + 1);
-			}
-
-			if (TEMPORAL) {
-
-				if (!associationsTemporalValidation
-						.containsKey(userToIDFilteredValidation
-								.get(referenceeID))) {
-					HashMap<Integer, ArrayList<Double>> refs = new HashMap<Integer, ArrayList<Double>>();
-					associationsTemporalValidation.put(
-							userToIDFilteredValidation.get(referenceeID), refs);
-				}
-
-				if (!associationsTemporalValidation
-						.containsKey(userToIDFilteredValidation
-								.get(opinionHolderID))) {
-					HashMap<Integer, ArrayList<Double>> refs = new HashMap<Integer, ArrayList<Double>>();
-					associationsTemporalValidation.put(
-							userToIDFilteredValidation.get(opinionHolderID),
-							refs);
-				}
-
-				HashMap<Integer, ArrayList<Double>> refs = associationsTemporalValidation
-						.get(userToIDFilteredValidation.get(opinionHolderID));
-
-				if (!refs.containsKey(userToIDFilteredValidation
-						.get(referenceeID))) {
-					refs.put(userToIDFilteredValidation.get(referenceeID),
-							new ArrayList<Double>());
-				}
-
-				ArrayList<Double> Usertimestamps = refs
-						.get(userToIDFilteredValidation.get(referenceeID));
-
-				Usertimestamps.add(timestamp);
-
-				refs.put(userToIDFilteredValidation.get(referenceeID),
-						Usertimestamps);
-				associationsTemporalValidation.put(
-						userToIDFilteredValidation.get(opinionHolderID), refs);
-			} else {
-
-				ArrayList<String> referenceesList = associationsValidation
-						.get(opinionHolderID);
-				referenceesList.add(referenceeID);
-				associationsValidation.put(opinionHolderID, referenceesList);
-			}
-		}
+		ArrayList<String> userTweets = validationUserTweets
+				.get(opinionHolderID);
+		userTweets.add(opinion.getSent());
+		validationUserTweets.put(opinionHolderID, userTweets);
 	}
 
 	public void parseOpinion(Opinion opinion, String opinionHolderID) {
@@ -262,14 +169,6 @@ public class XMLParsing {
 				ArrayList<String> referencees = new ArrayList<String>();
 				associations.put(opinionHolderID, referencees);
 			}
-
-			/*
-			 * if (!associationsTemporal.containsKey(userToIDFiltered
-			 * .get(opinionHolderID))) { HashMap<Integer, ArrayList<Double>>
-			 * refs = new HashMap<Integer, ArrayList<Double>>();
-			 * associationsTemporal.put(userToIDFiltered.get(opinionHolderID),
-			 * refs); }
-			 */
 		} else {
 			users.put(opinionHolderID, users.get(opinionHolderID) + 1);
 		}
@@ -352,7 +251,6 @@ public class XMLParsing {
 		timestampSplit = timestamps
 				.get((int) ((double) (timestamps.size() - 1) * ratio));
 		System.out.println(timestampSplit + " " + timestamps.size());
-		int index = (int) ((double) (timestamps.size() - 1) * ratio);
 	}
 
 	public void readFiles() {
@@ -425,7 +323,6 @@ public class XMLParsing {
 	int a[] = new int[1000000];
 
 	public void printPaths(Integer node, int index, int visited[]) {
-		// System.out.println("Index is " + index + " and node is " + node);
 		HashMap<Integer, ArrayList<Double>> rr = associationsTemporal.get(node);
 		if (!associationsTemporal.containsKey(node) || visited[node] == 1
 				|| rr.size() == 0) {
@@ -439,7 +336,6 @@ public class XMLParsing {
 			System.out.println();
 			return;
 		}
-		// System.out.print("here" );
 		a[index] = node;
 		visited[node] = 1;
 
@@ -456,15 +352,7 @@ public class XMLParsing {
 		temporal.readFiles();
 		temporal.countUsersOccuringMoreThanOnce();
 		System.out.println(temporal.countAssociations);
-		// System.out.println(temporal.associationsTemporal.size());
 
-		// Printing Paths
-		/*
-		 * int visited[] = new int[1000000]; for (int i = 0; i < 100000; i++) {
-		 * visited[i] = 0; } for (Integer ii :
-		 * temporal.associationsTemporal.keySet()) { for (int i = 0; i < 100000;
-		 * i++) { visited[i] = 0; } temporal.printPaths(ii, 0, visited); }
-		 */
 		TreeMap<Integer, String> userwithRanks = null;
 		if (!TEMPORAL) {
 			BuildMentionsMatrix mentionsmatrix = new BuildMentionsMatrix(
@@ -496,74 +384,44 @@ public class XMLParsing {
 			// pr.DisplayRankStatistics(ranksOb);
 		}
 
-		// TreeMap<Integer, String> userwithRanksVal = null;
-		// if (!TEMPORAL) {
-		// BuildMentionsMatrix mentionsmatrix = new BuildMentionsMatrix(
-		// temporal.associationsValidation, temporal.userToIDFilteredValidation,
-		// temporal.IDToUserFilteredValidation);
-		// System.out.println("Debug: Size of associations:"
-		// + temporal.associationsValidation.size());
-		//
-		// PageRanksSparse pr = new PageRanksSparse(mentionsmatrix.mentions);
-		// pr.CalculateRanks();
-		// HashMap<String, Integer> ranksOb = pr.GetRanks(
-		// temporal.userToIDFilteredValidation,
-		// temporal.IDToUserFilteredValidation);
-		// System.out.println("Success!!");
-		// userwithRanksVal = pr.DisplayRanks(ranksOb);
-		// //pr.DisplayRankStatistics(ranksOb);
-		// } else {
-		// BuildTemporalMatrix temporalMatrix = new BuildTemporalMatrix(
-		// temporal.associationsTemporalValidation,
-		// temporal.usersValidation.size());
-		// System.out.println("Debug: Size of associations:"
-		// + temporal.associationsTemporalValidation.size());
-		//
-		// PageRanksSparse pr = new PageRanksSparse(
-		// temporalMatrix.temporalMatrix);
-		// pr.CalculateRanks();
-		// HashMap<String, Integer> ranksOb = pr.GetRanks(
-		// temporal.userToIDFilteredValidation,
-		// temporal.IDToUserFilteredValidation);
-		// System.out.println("Success!!");
-		// userwithRanksVal = pr.DisplayRanks(ranksOb);
-		// //pr.DisplayRankStatistics(ranksOb);
-		// }
-
 		System.out.println("User with ranks size :: " + userwithRanks.size());
 		GetTweets getTweetsTrain = new GetTweets(userwithRanks);
 		ArrayList<UserData> userdataTrain = getTweetsTrain.getTopUserData();
 		System.out.println("Size of user data train: " + userdataTrain.size());
 		LanguageModel modelTrain = new LanguageModel(userdataTrain);
-		
-		HashMap<String, Integer> randomWords = modelTrain.GetRandomWords(PageRank.PageRanksSparse.NumWordsToCompare);
-		
-		HashMap<String, Integer> topWords = modelTrain.GetSelectedWords(PageRank.PageRanksSparse.NumWordsToCompare);
-		
+
+		HashMap<String, Integer> randomWords = modelTrain
+				.GetRandomWords(PageRank.PageRanksSparse.NumWordsToCompare);
+
+		HashMap<String, Integer> topWords = modelTrain
+				.GetSelectedWords(PageRank.PageRanksSparse.NumWordsToCompare);
+
 		System.out.println("Top words selected");
 		System.out.println(topWords.toString());
-		
+
 		System.out.println("Random words selected");
 		System.out.println(randomWords.toString());
-		
-		LanguageModel validationModel = new LanguageModel(temporal.validationUserTweets, true);
-		HashMap<String, Integer> validationWords = validationModel.GetSelectedWords(PageRank.PageRanksSparse.NumWordsToCompare);
+
+		LanguageModel validationModel = new LanguageModel(
+				temporal.validationUserTweets, true);
+		HashMap<String, Integer> validationWords = validationModel
+				.GetSelectedWords(PageRank.PageRanksSparse.NumWordsToCompare);
 		System.out.println("Top words selected from Validation");
 		System.out.println(validationWords.toString());
-		
+
 		System.out.println("Accuracy of Model");
-		int numMatch=0;
-		for(String x:validationWords.keySet()){
-			if(topWords.containsKey(x)){
+		int numMatch = 0;
+		for (String x : validationWords.keySet()) {
+			if (topWords.containsKey(x)) {
 				numMatch++;
 			}
 		}
 		System.out.println("Number of Matches:: " + numMatch);
-		
+
 		System.out.println("Accuracy of Random Model");
-		numMatch=0;
-		for(String x:validationWords.keySet()){
-			if(randomWords.containsKey(x)){
+		numMatch = 0;
+		for (String x : validationWords.keySet()) {
+			if (randomWords.containsKey(x)) {
 				numMatch++;
 			}
 		}
