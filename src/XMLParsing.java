@@ -28,7 +28,8 @@ public class XMLParsing {
 	HashMap<String, Integer> userToIDFiltered;
 	HashMap<Integer, String> IDToUserFiltered;
 	ArrayList<Double> timestamps;
-	HashMap<String, ArrayList<String>> validationUserTweets;
+	ArrayList<String> validationUserTweets;
+	HashMap<String, ArrayList<String>> userTweets;
 	int userIDs;
 	int countAssociations;
 	double timestampSplit;
@@ -41,7 +42,8 @@ public class XMLParsing {
 		userToIDFiltered = new HashMap<String, Integer>();
 		IDToUserFiltered = new HashMap<Integer, String>();
 		timestamps = new ArrayList<Double>();
-		validationUserTweets = new HashMap<String, ArrayList<String>>();
+		validationUserTweets = new ArrayList<String>();
+		userTweets = new HashMap<String, ArrayList<String>>();
 		userIDs = 0;
 		countAssociations = 0;
 		timestampSplit = -1.0;
@@ -138,14 +140,7 @@ public class XMLParsing {
 
 	public void parseOpinionValidtion(Opinion opinion, String opinionHolderID) {
 
-		if (!validationUserTweets.containsKey(opinionHolderID)) {
-			ArrayList<String> userTweets = new ArrayList<String>();
-			validationUserTweets.put(opinionHolderID, userTweets);
-		}
-		ArrayList<String> userTweets = validationUserTweets
-				.get(opinionHolderID);
-		userTweets.add(opinion.getSent());
-		validationUserTweets.put(opinionHolderID, userTweets);
+		validationUserTweets.add(opinion.getSent());
 	}
 
 	public void parseOpinion(Opinion opinion, String opinionHolderID) {
@@ -160,6 +155,14 @@ public class XMLParsing {
 			return;
 		}
 
+		if (!userTweets.containsKey(opinionHolderID)) {
+			ArrayList<String> tweets = new ArrayList<String>();
+			userTweets.put(opinionHolderID, tweets);
+		}
+		ArrayList<String> tweets = userTweets.get(opinionHolderID);
+		tweets.add(opinion.getSent());
+		userTweets.put(opinionHolderID, tweets);
+		
 		if (!users.containsKey(opinionHolderID)) {
 			users.put(opinionHolderID, 1);
 			userToIDFiltered.put(opinionHolderID, userIDs);
