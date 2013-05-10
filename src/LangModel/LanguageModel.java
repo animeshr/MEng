@@ -32,8 +32,18 @@ public class LanguageModel {
 		GetUnigrams(data);
 		System.out.println("Language Model Created");
 	}
-	
-	public LanguageModel(ArrayList<String> tweets, boolean validation){
+
+	public LanguageModel(HashMap<String, ArrayList<String>> tweets) {
+		rankLimit = tweets.size();
+		totalWords = 0;
+		UnigramFreqs = new HashMap<String, Integer>();
+		stoplist = new HashSet<String>();
+		GetStopWords();
+		MODE = 2;
+		GetUnigrams(tweets);
+	}
+
+	public LanguageModel(ArrayList<String> tweets, boolean validation) {
 		rankLimit = tweets.size();
 		totalWords = 0;
 		UnigramFreqs = new HashMap<String, Integer>();
@@ -67,6 +77,20 @@ public class LanguageModel {
 		}
 	}
 
+	public void GetUnigrams(HashMap<String, ArrayList<String>> arr) {
+		Object[] entries = arr.keySet().toArray();
+		Random generator = new Random();
+		int count = 0;
+		while (count < PageRank.PageRanksSparse.NumUsersToCompare
+				|| UnigramFreqs.size() < PageRank.PageRanksSparse.NumWordsToCompare) {
+			String randomValue = (String) entries[generator
+					.nextInt(entries.length)];
+			ArrayList<String> obj = arr.get(randomValue);
+			GetUnigrams(obj, true);
+			System.out.print("."); count++;
+		}
+	}
+
 	public void GetUnigrams(ArrayList<UserData> arr) {
 		for (UserData x : arr) {
 			GetUnigrams(x);
@@ -77,10 +101,10 @@ public class LanguageModel {
 	public int GetFactor(int dataRank) {
 		if (MODE == 1) {
 			return rankLimit - dataRank;
-		} else if (MODE == 2){
+		} else if (MODE == 2) {
 			return 1;
-		}else {
-			return (int)(Math.log(dataRank));
+		} else {
+			return (1+(int) (Math.log(dataRank)));
 		}
 	}
 
@@ -89,7 +113,7 @@ public class LanguageModel {
 			GetUnigrams(x);
 		}
 	}
-	
+
 	public void GetUnigrams(String data) {
 		String line = data;
 		int factor = GetFactor(0);
@@ -100,7 +124,8 @@ public class LanguageModel {
 			token = token.toLowerCase();
 
 			// Stoplist check
-			if (stoplist.contains(token) || token.length() <= 2 || Filter(token))
+			if (stoplist.contains(token) || token.length() <= 2
+					|| Filter(token))
 				continue;
 			if (UnigramFreqs.containsKey(token)) {
 				UnigramFreqs.put(token, UnigramFreqs.get(token) + (factor));
@@ -110,15 +135,17 @@ public class LanguageModel {
 			totalWords++;
 		}
 	}
-	
-	public boolean Filter(String word){
-		for(char i = '0'; i <= '9'; i++){
-			if(word.contains("" + i)) return true;
+
+	public boolean Filter(String word) {
+		for (char i = '0'; i <= '9'; i++) {
+			if (word.contains("" + i))
+				return true;
 		}
-		if(word.contains("#") || word.contains("@")) return true;
+		if (word.contains("#") || word.contains("@"))
+			return true;
 		return false;
 	}
-	
+
 	public void GetUnigrams(UserData data) {
 		TreeMap<Double, String> userData = data.tweets;
 		int factor = GetFactor(data.rank);
@@ -133,10 +160,11 @@ public class LanguageModel {
 				token = token.toLowerCase();
 
 				// Stoplist check
-				if (stoplist.contains(token) || token.length() <= 2 || Filter(token))
+				if (stoplist.contains(token) || token.length() <= 2
+						|| Filter(token))
 					continue;
-				//System.out.println(data.userID + " " + token + " ");
-				
+				// System.out.println(data.userID + " " + token + " ");
+
 				if (UnigramFreqs.containsKey(token)) {
 					UnigramFreqs.put(token, UnigramFreqs.get(token) + (factor));
 				} else {
@@ -146,14 +174,15 @@ public class LanguageModel {
 			}
 		}
 	}
-	
-	public HashMap<String, Integer> GetRandomWords(int numWords){
+
+	public HashMap<String, Integer> GetRandomWords(int numWords) {
 		HashMap<String, Integer> toRet = new HashMap<String, Integer>();
 		Random generator = new Random();
 		Object[] entries = UnigramFreqs.keySet().toArray();
 		System.out.println("Inside Random");
-		while(toRet.size() != (numWords-1)){
-			String randomValue = (String)entries[generator.nextInt(entries.length)];
+		while (toRet.size() != (numWords - 1)) {
+			String randomValue = (String) entries[generator
+					.nextInt(entries.length)];
 			Integer val = UnigramFreqs.get(randomValue);
 			toRet.put(randomValue, val);
 			System.out.print("-");

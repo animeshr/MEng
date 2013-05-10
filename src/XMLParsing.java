@@ -33,7 +33,7 @@ public class XMLParsing {
 	int userIDs;
 	int countAssociations;
 	double timestampSplit;
-	static boolean TEMPORAL = false;
+	static boolean TEMPORAL = true;
 
 	HashMap<Integer, HashMap<Integer, ArrayList<Double>>> associationsTemporal;
 
@@ -393,10 +393,11 @@ public class XMLParsing {
 		System.out.println("Size of user data train: " + userdataTrain.size());
 		LanguageModel modelTrain = new LanguageModel(userdataTrain);
 
-		HashMap<String, Integer> randomWords = modelTrain
-				.GetRandomWords(PageRank.PageRanksSparse.NumWordsToCompare);
-
 		HashMap<String, Integer> topWords = modelTrain
+				.GetSelectedWords(PageRank.PageRanksSparse.NumWordsToCompare);
+		
+		LanguageModel modelRandom = new LanguageModel(temporal.userTweets);
+		HashMap<String, Integer> randomWords = modelRandom
 				.GetSelectedWords(PageRank.PageRanksSparse.NumWordsToCompare);
 
 		System.out.println("Top words selected");
