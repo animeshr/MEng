@@ -18,7 +18,7 @@ import com.meng.parsing.xml.Opinions;
 public class GetTweets {
 	ArrayList<UserData> topUserData;
 
-	GetTweets(TreeMap<Integer, String> topUsers) {
+	public GetTweets(TreeMap<Integer, String> topUsers) {
 		topUserData = new ArrayList<UserData>();
 		populateTopUserData(topUsers);
 	}
@@ -118,24 +118,21 @@ public class GetTweets {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-		for (String username : topUserMap.keySet()) {
-			topUserData.add(topUserMap.get(username));
-		}
 	}
 
 	public void populateTopUserData(TreeMap<Integer, String> topUsers) {
-
 		TreeMap<String, UserData> topUserMap = new TreeMap<String, UserData>();
 		for (Integer rank : topUsers.keySet()) {
 			UserData user = new UserData(topUsers.get(rank), rank);
 			topUserMap.put(topUsers.get(rank), user);
 		}
-
 		int Numfiles = 15;
 		for (int i = 1; i <= Numfiles; i++) {
 			String filename = "data/bestpic/" + i + ".xml";
 			getOpinions(filename, topUserMap);
+		}
+		for (String username : topUserMap.keySet()) {
+			topUserData.add(topUserMap.get(username));
 		}
 	}
 

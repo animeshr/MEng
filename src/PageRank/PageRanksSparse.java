@@ -103,7 +103,7 @@ public class PageRanksSparse {
 		return usertoRanks;
 	}
 
-	public void DisplayRanks(HashMap<String, Integer> UserToRanks) {
+	public TreeMap<Integer, String> DisplayRanks(HashMap<String, Integer> UserToRanks) {
 		System.out.println("Ranks: Top 10 users");
 		TreeMap<Integer, String> rankswithUsers = new TreeMap<Integer, String>();
 		int overallrank=1;
@@ -118,8 +118,9 @@ public class PageRanksSparse {
 		int c=0;
 		for(Integer k: rankswithUsers.keySet()){
 			System.out.println("Rank: " + k + ", user:" + rankswithUsers.get(k));
-			if(c++ >= 10) return;
+			if(c++ > 10) break;
 		}
+		return rankswithUsers;
 	}
 
 	public void DisplayRankStatistics(HashMap<String, Integer> UserToRanks) {

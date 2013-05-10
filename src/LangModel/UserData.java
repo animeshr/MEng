@@ -3,7 +3,7 @@ package LangModel;
 import java.util.TreeMap;
 
 public class UserData {
-	String userID;
+	public String userID;
 	public Integer rank;
 	public TreeMap<Double, String> tweets;
 

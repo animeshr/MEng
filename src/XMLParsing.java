@@ -5,11 +5,16 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.TreeMap;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
+
+import LangModel.LanguageModel;
+import LangModel.UserData;
 import PageRank.BuildMentionsMatrix;
 import PageRank.PageRanksSparse;
+import PredictionData.GetTweets;
 import Temporal.BuildTemporalMatrix;
 
 import com.meng.parsing.xml.OhRefs;
@@ -27,6 +32,7 @@ public class XMLParsing {
 	HashMap<String, Integer> userToIDFilteredValidation;
 	HashMap<Integer, String> IDToUserFilteredValidation;
 	ArrayList<Double> timestamps;
+	ArrayList<String> validationUserTweets;
 	int userIDs;
 	int countAssociations;
 	int userIDsValidation;
@@ -36,6 +42,8 @@ public class XMLParsing {
 
 	HashMap<Integer, HashMap<Integer, ArrayList<Double>>> associationsTemporal;
 	HashMap<Integer, HashMap<Integer, ArrayList<Double>>> associationsTemporalValidation;
+	
+	public static final int NumWordsToCompare = 10;
 
 	XMLParsing(Boolean isTemporal) {
 		users = new HashMap<String, Integer>();
@@ -45,6 +53,7 @@ public class XMLParsing {
 		userToIDFilteredValidation = new HashMap<String, Integer>();
 		IDToUserFilteredValidation = new HashMap<Integer, String>();
 		timestamps = new ArrayList<Double>();
+		validationUserTweets = new ArrayList<String>();
 		userIDs = 0;
 		countAssociations = 0;
 		userIDsValidation = 0;
@@ -146,6 +155,7 @@ public class XMLParsing {
 	public void parseOpinionValidtion(Opinion opinion, String opinionHolderID) {
 
 		Double timestamp = getTime(opinion.getTimestamp());
+		validationUserTweets.add(opinion.getSent());
 
 		if (!usersValidation.containsKey(opinionHolderID)) {
 			usersValidation.put(opinionHolderID, 1);
@@ -459,7 +469,7 @@ public class XMLParsing {
 		 * temporal.associationsTemporal.keySet()) { for (int i = 0; i < 100000;
 		 * i++) { visited[i] = 0; } temporal.printPaths(ii, 0, visited); }
 		 */
-
+		TreeMap<Integer, String> userwithRanks = null;
 		if (!TEMPORAL) {
 			BuildMentionsMatrix mentionsmatrix = new BuildMentionsMatrix(
 					temporal.associations, temporal.userToIDFiltered,
@@ -472,8 +482,8 @@ public class XMLParsing {
 			HashMap<String, Integer> ranksOb = pr.GetRanks(
 					temporal.userToIDFiltered, temporal.IDToUserFiltered);
 			System.out.println("Success!!");
-			pr.DisplayRanks(ranksOb);
-			pr.DisplayRankStatistics(ranksOb);
+			userwithRanks = pr.DisplayRanks(ranksOb);
+			// pr.DisplayRankStatistics(ranksOb);
 		} else {
 			BuildTemporalMatrix temporalMatrix = new BuildTemporalMatrix(
 					temporal.associationsTemporal, temporal.users.size());
@@ -486,9 +496,63 @@ public class XMLParsing {
 			HashMap<String, Integer> ranksOb = pr.GetRanks(
 					temporal.userToIDFiltered, temporal.IDToUserFiltered);
 			System.out.println("Success!!");
-			pr.DisplayRanks(ranksOb);
-			pr.DisplayRankStatistics(ranksOb);
+			userwithRanks = pr.DisplayRanks(ranksOb);
+			// pr.DisplayRankStatistics(ranksOb);
 		}
 
+		// TreeMap<Integer, String> userwithRanksVal = null;
+		// if (!TEMPORAL) {
+		// BuildMentionsMatrix mentionsmatrix = new BuildMentionsMatrix(
+		// temporal.associationsValidation, temporal.userToIDFilteredValidation,
+		// temporal.IDToUserFilteredValidation);
+		// System.out.println("Debug: Size of associations:"
+		// + temporal.associationsValidation.size());
+		//
+		// PageRanksSparse pr = new PageRanksSparse(mentionsmatrix.mentions);
+		// pr.CalculateRanks();
+		// HashMap<String, Integer> ranksOb = pr.GetRanks(
+		// temporal.userToIDFilteredValidation,
+		// temporal.IDToUserFilteredValidation);
+		// System.out.println("Success!!");
+		// userwithRanksVal = pr.DisplayRanks(ranksOb);
+		// //pr.DisplayRankStatistics(ranksOb);
+		// } else {
+		// BuildTemporalMatrix temporalMatrix = new BuildTemporalMatrix(
+		// temporal.associationsTemporalValidation,
+		// temporal.usersValidation.size());
+		// System.out.println("Debug: Size of associations:"
+		// + temporal.associationsTemporalValidation.size());
+		//
+		// PageRanksSparse pr = new PageRanksSparse(
+		// temporalMatrix.temporalMatrix);
+		// pr.CalculateRanks();
+		// HashMap<String, Integer> ranksOb = pr.GetRanks(
+		// temporal.userToIDFilteredValidation,
+		// temporal.IDToUserFilteredValidation);
+		// System.out.println("Success!!");
+		// userwithRanksVal = pr.DisplayRanks(ranksOb);
+		// //pr.DisplayRankStatistics(ranksOb);
+		// }
+
+		System.out.println("User with ranks size :: " + userwithRanks.size());
+		GetTweets getTweetsTrain = new GetTweets(userwithRanks);
+		ArrayList<UserData> userdataTrain = getTweetsTrain.getTopUserData();
+		System.out.println("Size of user data train: " + userdataTrain.size());
+		LanguageModel modelTrain = new LanguageModel(userdataTrain);
+		
+		HashMap<String, Integer> randomWords = modelTrain.GetRandomWords(NumWordsToCompare);
+		
+		HashMap<String, Integer> topWords = modelTrain.GetSelectedWords(NumWordsToCompare);
+		
+		System.out.println("Top words selected");
+		System.out.println(topWords.toString());
+		
+		System.out.println("Random words selected");
+		System.out.println(randomWords.toString());
+		
+		LanguageModel validationModel = new LanguageModel(temporal.validationUserTweets, true);
+		HashMap<String, Integer> validationWords = validationModel.GetSelectedWords(NumWordsToCompare);
+		System.out.println("Top words selected from Validation");
+		System.out.println(validationWords.toString());
 	}
 }
