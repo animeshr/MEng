@@ -16,6 +16,8 @@ import com.meng.parsing.xml.Opinion;
 import com.meng.parsing.xml.Opinions;
 
 public class GetTweets {
+	public static final String filepath = "data/mobile/";
+	public static final int NumFiles = 718;
 	ArrayList<UserData> topUserData;
 
 	public GetTweets(TreeMap<Integer, String> topUsers) {
@@ -126,9 +128,8 @@ public class GetTweets {
 			UserData user = new UserData(topUsers.get(rank), rank);
 			topUserMap.put(topUsers.get(rank), user);
 		}
-		int Numfiles = 15;
-		for (int i = 1; i <= Numfiles; i++) {
-			String filename = "data/bestpic/" + i + ".xml";
+		for (int i = 1; i <= NumFiles; i++) {
+			String filename = filepath + i + ".xml";
 			getOpinions(filename, topUserMap);
 		}
 		for (String username : topUserMap.keySet()) {

@@ -13,11 +13,12 @@ import java.util.StringTokenizer;
 import java.util.TreeMap;
 
 public class LanguageModel {
-	public int MODE = 1;
+	public int MODE = 0;
 	public HashMap<String, Integer> UnigramFreqs;
 	public HashSet<String> stoplist;
 	public int totalWords;
 	public int rankLimit;
+	public String tokenParams = " ;':*&^-!(),/$\".?";
 
 	public static String STOPLIST = "stoplist";
 
@@ -92,14 +93,14 @@ public class LanguageModel {
 	public void GetUnigrams(String data) {
 		String line = data;
 		int factor = GetFactor(0);
-		StringTokenizer st = new StringTokenizer(line, " ;':*&^-!(),/$\".?#@");// " ;':*&^-!(),/$\"."
+		StringTokenizer st = new StringTokenizer(line, tokenParams);// " ;':*&^-!(),/$\"."
 		while (st.hasMoreTokens()) {
 			String token = st.nextToken();
 			token = token.trim();
 			token = token.toLowerCase();
 
 			// Stoplist check
-			if (stoplist.contains(token) || token.length() <= 2)
+			if (stoplist.contains(token) || token.length() <= 2 || Filter(token))
 				continue;
 			if (UnigramFreqs.containsKey(token)) {
 				UnigramFreqs.put(token, UnigramFreqs.get(token) + (factor));
@@ -109,22 +110,32 @@ public class LanguageModel {
 			totalWords++;
 		}
 	}
+	
+	public boolean Filter(String word){
+		for(char i = '0'; i <= '9'; i++){
+			if(word.contains("" + i)) return true;
+		}
+		if(word.contains("#") || word.contains("@")) return true;
+		return false;
+	}
+	
 	public void GetUnigrams(UserData data) {
 		TreeMap<Double, String> userData = data.tweets;
 		int factor = GetFactor(data.rank);
 
 		for (Double key : userData.keySet()) {
 			String line = userData.get(key);
-			StringTokenizer st = new StringTokenizer(line, " ;':*&^-!(),/$\".?#@");// " ;':*&^-!(),/$\"."
+			System.out.println(line);
+			StringTokenizer st = new StringTokenizer(line, tokenParams);// " ;':*&^-!(),/$\"."
 			while (st.hasMoreTokens()) {
 				String token = st.nextToken();
 				token = token.trim();
 				token = token.toLowerCase();
 
 				// Stoplist check
-				if (stoplist.contains(token) || token.length() <= 2)
+				if (stoplist.contains(token) || token.length() <= 2 || Filter(token))
 					continue;
-				System.out.println(data.userID + " " + token + " ");
+				//System.out.println(data.userID + " " + token + " ");
 				
 				if (UnigramFreqs.containsKey(token)) {
 					UnigramFreqs.put(token, UnigramFreqs.get(token) + (factor));

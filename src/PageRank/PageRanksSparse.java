@@ -6,6 +6,8 @@ import java.util.TreeMap;
 
 
 public class PageRanksSparse {
+	public static final int NumWordsToCompare = 10;
+	public static final int NumUsersToCompare = 20;
 	SparseMatrix linkMatrix;
 	ArrayList<Double> w;
 	int linkMatrixSize;
@@ -57,7 +59,7 @@ public class PageRanksSparse {
 				count++;
 			}
 		}
-		if(count/total > 0.1) { System.out.println("disp " + (count/total)); return false; }
+		if(count/total > 0.01) { System.out.println("disp " + (count/total)); return false; }
 		return true;
 	}
 
@@ -104,10 +106,10 @@ public class PageRanksSparse {
 	}
 
 	public TreeMap<Integer, String> DisplayRanks(HashMap<String, Integer> UserToRanks) {
-		System.out.println("Ranks: Top 10 users");
+		System.out.println("Ranks: Top "+ NumUsersToCompare +" users");
 		TreeMap<Integer, String> rankswithUsers = new TreeMap<Integer, String>();
 		int overallrank=1;
-		for(int ra = 1; ra<=10; ra++){
+		for(int ra = 1; ra<= NumUsersToCompare; ra++){
 			for (String userID : UserToRanks.keySet()) {
 				Integer rank = UserToRanks.get(userID);
 				if(rank == ra){
@@ -118,7 +120,7 @@ public class PageRanksSparse {
 		int c=0;
 		for(Integer k: rankswithUsers.keySet()){
 			System.out.println("Rank: " + k + ", user:" + rankswithUsers.get(k));
-			if(c++ > 10) break;
+			if(c++ > NumUsersToCompare) break;
 		}
 		return rankswithUsers;
 	}

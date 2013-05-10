@@ -38,13 +38,11 @@ public class XMLParsing {
 	int userIDsValidation;
 	int countAssociationsValidation;
 	double timestampSplit;
-	static boolean TEMPORAL = true;
-
+	static boolean TEMPORAL = false;
+	
 	HashMap<Integer, HashMap<Integer, ArrayList<Double>>> associationsTemporal;
 	HashMap<Integer, HashMap<Integer, ArrayList<Double>>> associationsTemporalValidation;
 	
-	public static final int NumWordsToCompare = 10;
-
 	XMLParsing(Boolean isTemporal) {
 		users = new HashMap<String, Integer>();
 		usersValidation = new HashMap<String, Integer>();
@@ -358,9 +356,8 @@ public class XMLParsing {
 	}
 
 	public void readFiles() {
-		int Numfiles = 15;
-		for (int i = 1; i <= Numfiles; i++) {
-			String filename = "data/bestpic/" + i + ".xml";
+		for (int i = 1; i <= PredictionData.GetTweets.NumFiles; i++) {
+			String filename = PredictionData.GetTweets.filepath + i + ".xml";
 			getOpinions(filename);
 		}
 	}
@@ -383,9 +380,8 @@ public class XMLParsing {
 	}
 
 	public void readFilesAndFindSplitTime() {
-		int Numfiles = 15;
-		for (int i = 1; i <= Numfiles; i++) {
-			String filename = "data/bestpic/" + i + ".xml";
+		for (int i = 1; i <= PredictionData.GetTweets.NumFiles; i++) {
+			String filename = PredictionData.GetTweets.filepath + i + ".xml";
 			findTimes(filename);
 		}
 		Collections.sort(timestamps);
@@ -540,9 +536,9 @@ public class XMLParsing {
 		System.out.println("Size of user data train: " + userdataTrain.size());
 		LanguageModel modelTrain = new LanguageModel(userdataTrain);
 		
-		HashMap<String, Integer> randomWords = modelTrain.GetRandomWords(NumWordsToCompare);
+		HashMap<String, Integer> randomWords = modelTrain.GetRandomWords(PageRank.PageRanksSparse.NumWordsToCompare);
 		
-		HashMap<String, Integer> topWords = modelTrain.GetSelectedWords(NumWordsToCompare);
+		HashMap<String, Integer> topWords = modelTrain.GetSelectedWords(PageRank.PageRanksSparse.NumWordsToCompare);
 		
 		System.out.println("Top words selected");
 		System.out.println(topWords.toString());
@@ -551,8 +547,26 @@ public class XMLParsing {
 		System.out.println(randomWords.toString());
 		
 		LanguageModel validationModel = new LanguageModel(temporal.validationUserTweets, true);
-		HashMap<String, Integer> validationWords = validationModel.GetSelectedWords(NumWordsToCompare);
+		HashMap<String, Integer> validationWords = validationModel.GetSelectedWords(PageRank.PageRanksSparse.NumWordsToCompare);
 		System.out.println("Top words selected from Validation");
 		System.out.println(validationWords.toString());
+		
+		System.out.println("Accuracy of Model");
+		int numMatch=0;
+		for(String x:validationWords.keySet()){
+			if(topWords.containsKey(x)){
+				numMatch++;
+			}
+		}
+		System.out.println("Number of Matches:: " + numMatch);
+		
+		System.out.println("Accuracy of Random Model");
+		numMatch=0;
+		for(String x:validationWords.keySet()){
+			if(randomWords.containsKey(x)){
+				numMatch++;
+			}
+		}
+		System.out.println("Number of Matches:: " + numMatch);
 	}
 }
