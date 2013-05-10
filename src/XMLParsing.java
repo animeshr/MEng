@@ -1,6 +1,7 @@
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
@@ -18,25 +19,43 @@ import com.meng.parsing.xml.Opinions;
 public class XMLParsing {
 
 	HashMap<String, Integer> users;
+	HashMap<String, Integer> usersValidation;
 	HashMap<String, ArrayList<String>> associations;
+	HashMap<String, ArrayList<String>> associationsValidation;
 	HashMap<String, Integer> userToIDFiltered;
 	HashMap<Integer, String> IDToUserFiltered;
+	HashMap<String, Integer> userToIDFilteredValidation;
+	HashMap<Integer, String> IDToUserFilteredValidation;
+	ArrayList<Double> timestamps;
 	int userIDs;
 	int countAssociations;
+	int userIDsValidation;
+	int countAssociationsValidation;
+	double timestampSplit;
 	static boolean TEMPORAL = true;
 
 	HashMap<Integer, HashMap<Integer, ArrayList<Double>>> associationsTemporal;
+	HashMap<Integer, HashMap<Integer, ArrayList<Double>>> associationsTemporalValidation;
 
 	XMLParsing(Boolean isTemporal) {
 		users = new HashMap<String, Integer>();
+		usersValidation = new HashMap<String, Integer>();
 		userToIDFiltered = new HashMap<String, Integer>();
 		IDToUserFiltered = new HashMap<Integer, String>();
+		userToIDFilteredValidation = new HashMap<String, Integer>();
+		IDToUserFilteredValidation = new HashMap<Integer, String>();
+		timestamps = new ArrayList<Double>();
 		userIDs = 0;
 		countAssociations = 0;
+		userIDsValidation = 0;
+		timestampSplit = -1.0;
+		countAssociationsValidation = 0;
 		if (isTemporal) {
 			associationsTemporal = new HashMap<Integer, HashMap<Integer, ArrayList<Double>>>();
+			associationsTemporalValidation = new HashMap<Integer, HashMap<Integer, ArrayList<Double>>>();
 		} else {
 			associations = new HashMap<String, ArrayList<String>>();
+			associationsValidation = new HashMap<String, ArrayList<String>>();
 		}
 	}
 
@@ -124,9 +143,108 @@ public class XMLParsing {
 		}
 	}
 
+	public void parseOpinionValidtion(Opinion opinion, String opinionHolderID) {
+
+		Double timestamp = getTime(opinion.getTimestamp());
+
+		if (!usersValidation.containsKey(opinionHolderID)) {
+			usersValidation.put(opinionHolderID, 1);
+			userToIDFilteredValidation.put(opinionHolderID, userIDsValidation);
+			IDToUserFilteredValidation.put(userIDsValidation, opinionHolderID);
+			userIDsValidation = userIDsValidation + 1;
+			if (!TEMPORAL) {
+				ArrayList<String> referencees = new ArrayList<String>();
+				associationsValidation.put(opinionHolderID, referencees);
+			}
+
+			/*
+			 * if (!associationsTemporal.containsKey(userToIDFiltered
+			 * .get(opinionHolderID))) { HashMap<Integer, ArrayList<Double>>
+			 * refs = new HashMap<Integer, ArrayList<Double>>();
+			 * associationsTemporal.put(userToIDFiltered.get(opinionHolderID),
+			 * refs); }
+			 */
+		} else {
+			usersValidation.put(opinionHolderID,
+					usersValidation.get(opinionHolderID) + 1);
+		}
+		OhRefs references = opinion.getOhRefs();
+		List<String> referencees = references.getOhRef();
+		for (String referenceeID : referencees) {
+			countAssociationsValidation++;
+			if (!usersValidation.containsKey(referenceeID)) {
+				usersValidation.put(referenceeID, 1);
+				userToIDFilteredValidation.put(referenceeID, userIDsValidation);
+				IDToUserFilteredValidation.put(userIDsValidation, referenceeID);
+				userIDsValidation = userIDsValidation + 1;
+				if (!TEMPORAL) {
+					associationsValidation.put(referenceeID,
+							new ArrayList<String>());
+				}
+			} else {
+				usersValidation.put(referenceeID,
+						usersValidation.get(referenceeID) + 1);
+			}
+
+			if (TEMPORAL) {
+
+				if (!associationsTemporalValidation
+						.containsKey(userToIDFilteredValidation
+								.get(referenceeID))) {
+					HashMap<Integer, ArrayList<Double>> refs = new HashMap<Integer, ArrayList<Double>>();
+					associationsTemporalValidation.put(
+							userToIDFilteredValidation.get(referenceeID), refs);
+				}
+
+				if (!associationsTemporalValidation
+						.containsKey(userToIDFilteredValidation
+								.get(opinionHolderID))) {
+					HashMap<Integer, ArrayList<Double>> refs = new HashMap<Integer, ArrayList<Double>>();
+					associationsTemporalValidation.put(
+							userToIDFilteredValidation.get(opinionHolderID),
+							refs);
+				}
+
+				HashMap<Integer, ArrayList<Double>> refs = associationsTemporalValidation
+						.get(userToIDFilteredValidation.get(opinionHolderID));
+
+				if (!refs.containsKey(userToIDFilteredValidation
+						.get(referenceeID))) {
+					refs.put(userToIDFilteredValidation.get(referenceeID),
+							new ArrayList<Double>());
+				}
+
+				ArrayList<Double> Usertimestamps = refs
+						.get(userToIDFilteredValidation.get(referenceeID));
+
+				Usertimestamps.add(timestamp);
+
+				refs.put(userToIDFilteredValidation.get(referenceeID),
+						Usertimestamps);
+				associationsTemporalValidation.put(
+						userToIDFilteredValidation.get(opinionHolderID), refs);
+			} else {
+
+				ArrayList<String> referenceesList = associationsValidation
+						.get(opinionHolderID);
+				referenceesList.add(referenceeID);
+				associationsValidation.put(opinionHolderID, referenceesList);
+			}
+		}
+	}
+
 	public void parseOpinion(Opinion opinion, String opinionHolderID) {
-		// String opinionHolderID = opinion.getOpId();
-		String timestamp = opinion.getTimestamp();
+
+		Double timestamp = getTime(opinion.getTimestamp());
+
+		Double limit = -1.0;
+
+		if (Double.compare(timestampSplit, limit) > 0
+				&& Double.compare(timestamp, timestampSplit) > 0) {
+			parseOpinionValidtion(opinion, opinionHolderID);
+			return;
+		}
+
 		if (!users.containsKey(opinionHolderID)) {
 			users.put(opinionHolderID, 1);
 			userToIDFiltered.put(opinionHolderID, userIDs);
@@ -137,12 +255,13 @@ public class XMLParsing {
 				associations.put(opinionHolderID, referencees);
 			}
 
-			/*if (!associationsTemporal.containsKey(userToIDFiltered
-					.get(opinionHolderID))) {
-				HashMap<Integer, ArrayList<Double>> refs = new HashMap<Integer, ArrayList<Double>>();
-				associationsTemporal.put(userToIDFiltered.get(opinionHolderID),
-						refs);
-			}*/
+			/*
+			 * if (!associationsTemporal.containsKey(userToIDFiltered
+			 * .get(opinionHolderID))) { HashMap<Integer, ArrayList<Double>>
+			 * refs = new HashMap<Integer, ArrayList<Double>>();
+			 * associationsTemporal.put(userToIDFiltered.get(opinionHolderID),
+			 * refs); }
+			 */
 		} else {
 			users.put(opinionHolderID, users.get(opinionHolderID) + 1);
 		}
@@ -186,12 +305,12 @@ public class XMLParsing {
 							new ArrayList<Double>());
 				}
 
-				ArrayList<Double> timestamps = refs.get(userToIDFiltered
+				ArrayList<Double> Usertimestamps = refs.get(userToIDFiltered
 						.get(referenceeID));
 
-				timestamps.add(getTime(timestamp));
+				Usertimestamps.add(timestamp);
 
-				refs.put(userToIDFiltered.get(referenceeID), timestamps);
+				refs.put(userToIDFiltered.get(referenceeID), Usertimestamps);
 				associationsTemporal.put(userToIDFiltered.get(opinionHolderID),
 						refs);
 			} else {
@@ -221,12 +340,45 @@ public class XMLParsing {
 		}
 	}
 
+	public void findSplitTimestamp(double ratio) {
+		timestampSplit = timestamps
+				.get((int) ((double) (timestamps.size() - 1) * ratio));
+		System.out.println(timestampSplit + " " + timestamps.size());
+		int index = (int) ((double) (timestamps.size() - 1) * ratio);
+	}
+
 	public void readFiles() {
 		int Numfiles = 15;
 		for (int i = 1; i <= Numfiles; i++) {
 			String filename = "data/bestpic/" + i + ".xml";
 			getOpinions(filename);
 		}
+	}
+
+	public void findTimes(String filename) {
+		try {
+			JAXBContext jc = JAXBContext.newInstance("com.meng.parsing.xml");
+			Unmarshaller unmarshaller = jc.createUnmarshaller();
+			Opinions ops = (Opinions) unmarshaller
+					.unmarshal(new File(filename));
+			List<Opinion> opn = ops.getOpinion();
+			for (int i = 0; i < opn.size(); i++) {
+				double timestamp = getTime(opn.get(i).getTimestamp());
+				timestamps.add(timestamp);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void readFilesAndFindSplitTime() {
+		int Numfiles = 15;
+		for (int i = 1; i <= Numfiles; i++) {
+			String filename = "data/bestpic/" + i + ".xml";
+			findTimes(filename);
+		}
+		Collections.sort(timestamps);
 	}
 
 	public void test() {
@@ -292,22 +444,21 @@ public class XMLParsing {
 
 	public static void main(String[] args) {
 		XMLParsing temporal = new XMLParsing(TEMPORAL);
+		temporal.readFilesAndFindSplitTime();
+		double trainingPercentage = 0.5;
+		temporal.findSplitTimestamp(trainingPercentage);
 		temporal.readFiles();
 		temporal.countUsersOccuringMoreThanOnce();
 		System.out.println(temporal.countAssociations);
-		//System.out.println(temporal.associationsTemporal.size());
+		// System.out.println(temporal.associationsTemporal.size());
 
 		// Printing Paths
-		/*int visited[] = new int[1000000];
-		for (int i = 0; i < 100000; i++) {
-			visited[i] = 0;
-		}
-		for (Integer ii : temporal.associationsTemporal.keySet()) {
-			for (int i = 0; i < 100000; i++) {
-				visited[i] = 0;
-			}
-			temporal.printPaths(ii, 0, visited);
-		}*/
+		/*
+		 * int visited[] = new int[1000000]; for (int i = 0; i < 100000; i++) {
+		 * visited[i] = 0; } for (Integer ii :
+		 * temporal.associationsTemporal.keySet()) { for (int i = 0; i < 100000;
+		 * i++) { visited[i] = 0; } temporal.printPaths(ii, 0, visited); }
+		 */
 
 		if (!TEMPORAL) {
 			BuildMentionsMatrix mentionsmatrix = new BuildMentionsMatrix(
