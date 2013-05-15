@@ -261,12 +261,12 @@ public class XMLParsing {
 
 		validationWeeks = timestamps.get(timestamps.size() - 1)
 				- timestamps
-						.get((int) (((double) (timestamps.size() - 1) * ratio) - 1.0));
-		
-		trainingWeeks = trainingWeeks / (double)(7 * 24 * 60 * 60);
-		
-		validationWeeks = validationWeeks / (double)(7 * 24 * 60 * 60);
-		
+						.get((int) (((double) (timestamps.size() - 1) * ratio) + 1.0));
+
+		trainingWeeks = trainingWeeks / (double) (7 * 24 * 60 * 60);
+
+		validationWeeks = validationWeeks / (double) (7 * 24 * 60 * 60);
+
 		System.out.println(timestampSplit + " " + timestamps.size());
 	}
 
@@ -410,39 +410,73 @@ public class XMLParsing {
 		HashMap<String, Integer> topWords = modelTrain
 				.GetSelectedWords(PageRank.PageRanksSparse.NumWordsToCompare);
 
+		LanguageModel modelT = new LanguageModel(temporal.userTweets, true);
+		LanguageModel validationModel = new LanguageModel(
+				temporal.validationUserTweets, true);
+
+		System.out.println("Predicted words from algorithm");
+		Double avgPinc = 0.0;
+		for (String word : topWords.keySet()) {
+			Double trainUsage = 1.0 * modelT.GetFrequency(word);
+			Double valUsage = 1.0 * validationModel.GetFrequency(word);
+			trainUsage /= temporal.trainingWeeks;
+			valUsage /= temporal.validationWeeks;
+			Double increase = (valUsage - trainUsage);
+			System.out.println("Usage of " + word + " in training is:"
+					+ trainUsage + ", and validation is:" + valUsage
+					+ ":: Increase: " + increase);
+			avgPinc += increase;
+		}
+		System.out.println("Avg Increase of usage of words: " + avgPinc/topWords.size());
+
 		LanguageModel modelRandom = new LanguageModel(temporal.userTweets);
 		HashMap<String, Integer> randomWords = modelRandom
 				.GetSelectedWords(PageRank.PageRanksSparse.NumWordsToCompare);
 
-		System.out.println("Top words selected");
-		System.out.println(topWords.toString());
-
-		System.out.println("Random words selected");
-		System.out.println(randomWords.toString());
-
-		LanguageModel validationModel = new LanguageModel(
-				temporal.validationUserTweets, true);
-		HashMap<String, Integer> validationWords = validationModel
-				.GetSelectedWords(PageRank.PageRanksSparse.NumWordsToCompare);
-		System.out.println("Top words selected from Validation");
-		System.out.println(validationWords.toString());
-
-		System.out.println("Accuracy of Model");
-		int numMatch = 0;
-		for (String x : validationWords.keySet()) {
-			if (topWords.containsKey(x)) {
-				numMatch++;
-			}
+		System.out.println("Random words");
+		Double avgInc = 0.0;
+		for (String word : randomWords.keySet()) {
+			Double trainUsage = 1.0 * modelT.GetFrequency(word);
+			Double valUsage = 1.0 * validationModel.GetFrequency(word);
+			trainUsage /= temporal.trainingWeeks;
+			valUsage /= temporal.validationWeeks;
+			Double increase = (valUsage - trainUsage);
+			System.out.println("Usage of " + word + " in training is:"
+					+ trainUsage + ", and validation is:" + valUsage
+					+ ":: Increase: " + increase);
+			avgInc += increase;
 		}
-		System.out.println("Number of Matches:: " + numMatch);
+		System.out.println("Avg Increase of Random words: " + avgInc/randomWords.size());
 
-		System.out.println("Accuracy of Random Model");
-		numMatch = 0;
-		for (String x : validationWords.keySet()) {
-			if (randomWords.containsKey(x)) {
-				numMatch++;
-			}
-		}
-		System.out.println("Number of Matches:: " + numMatch);
+		// System.out.println("Top words selected");
+		// System.out.println(topWords.toString());
+		//
+		// System.out.println("Random words selected");
+		// System.out.println(randomWords.toString());
+
+		// LanguageModel validationModel = new LanguageModel(
+		// temporal.validationUserTweets, true);
+		// HashMap<String, Integer> validationWords = validationModel
+		// .GetSelectedWords(PageRank.PageRanksSparse.NumWordsToCompare);
+		// System.out.println("Top words selected from Validation");
+		// System.out.println(validationWords.toString());
+		//
+		// System.out.println("Accuracy of Model");
+		// int numMatch = 0;
+		// for (String x : validationWords.keySet()) {
+		// if (topWords.containsKey(x)) {
+		// numMatch++;
+		// }
+		// }
+		// System.out.println("Number of Matches:: " + numMatch);
+		//
+		// System.out.println("Accuracy of Random Model");
+		// numMatch = 0;
+		// for (String x : validationWords.keySet()) {
+		// if (randomWords.containsKey(x)) {
+		// numMatch++;
+		// }
+		// }
+		// System.out.println("Number of Matches:: " + numMatch);
 	}
 }

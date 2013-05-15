@@ -42,6 +42,16 @@ public class LanguageModel {
 		MODE = 2;
 		GetUnigrams(tweets);
 	}
+	
+	public LanguageModel(HashMap<String, ArrayList<String>> tweets, boolean learnAll) {
+		rankLimit = tweets.size();
+		totalWords = 0;
+		UnigramFreqs = new HashMap<String, Integer>();
+		stoplist = new HashSet<String>();
+		GetStopWords();
+		MODE = 2;
+		GetUnigrams(tweets, true);
+	}
 
 	public LanguageModel(ArrayList<String> tweets, boolean validation) {
 		rankLimit = tweets.size();
@@ -77,6 +87,14 @@ public class LanguageModel {
 		}
 	}
 
+	public Integer GetFrequency(String word){
+		Integer toRet = new Integer(0);
+		if (UnigramFreqs.containsKey(word)) {
+			toRet = UnigramFreqs.get(word);
+		}
+		return toRet;
+	}
+	
 	public void GetUnigrams(HashMap<String, ArrayList<String>> arr) {
 		Object[] entries = arr.keySet().toArray();
 		Random generator = new Random();
@@ -88,6 +106,13 @@ public class LanguageModel {
 			ArrayList<String> obj = arr.get(randomValue);
 			GetUnigrams(obj, true);
 			System.out.print("."); count++;
+		}
+	}
+	
+	public void GetUnigrams(HashMap<String, ArrayList<String>> arr, boolean all) {
+		for(String user:arr.keySet()) {
+			ArrayList<String> tweets = arr.get(user);
+			GetUnigrams(tweets, true);
 		}
 	}
 
@@ -104,7 +129,7 @@ public class LanguageModel {
 		} else if (MODE == 2) {
 			return 1;
 		} else {
-			return (1+(int) (Math.log(rankLimit - dataRank)));
+			return (1+(int) (Math.log(dataRank)));
 		}
 	}
 
@@ -204,13 +229,13 @@ public class LanguageModel {
 					freq++;
 				}
 			}
+			System.out.print(i + " ");
 			ArrayList<String> toDel = new ArrayList<String>();
 			for (String key : UnigramFreqs.keySet()) {
 				Integer wordRank = UnigramFreqs.get(key);
 				if (maxRank == wordRank) {
 					freq--;
 					i++;
-					System.out.print(i + " ");
 					toRet.put(key, wordRank);
 					toDel.add(key);
 					if (freq == 0)

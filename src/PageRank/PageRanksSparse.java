@@ -1,5 +1,8 @@
 package PageRank;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeMap;
@@ -7,7 +10,7 @@ import java.util.TreeMap;
 
 public class PageRanksSparse {
 	public static final int NumWordsToCompare = 10;
-	public static final int NumUsersToCompare = 50;
+	public static final int NumUsersToCompare = 10; // 10, 20, 50, 100, 150, 200, 250, 500, 1000
 	SparseMatrix linkMatrix;
 	ArrayList<Double> w;
 	int linkMatrixSize;
@@ -59,7 +62,7 @@ public class PageRanksSparse {
 				count++;
 			}
 		}
-		if(count/total > 0.01) { System.out.println("disp " + (count/total)); return false; }
+		if(count/total > 0.001) { System.out.println("disp " + (count/total)); return false; }
 		return true;
 	}
 
@@ -137,8 +140,25 @@ public class PageRanksSparse {
 				freqs.put(rank, new Integer(1));
 			}
 		}
-		for(Integer rank: freqs.keySet()){
-			System.out.println(rank + " " + freqs.get(rank));
+		BufferedWriter bw = null;
+		try {
+			bw = new BufferedWriter(new FileWriter("rankStats"));
+		} catch (IOException e) {
+			System.out.println("Error in creating file writer");
+		}
+		try {
+			int dispRank = 1;
+			for(Integer rank: freqs.keySet()){
+				bw.write(rank + "\t" + freqs.get(rank)); 
+				bw.newLine();
+			}
+		} catch (IOException e) {
+			System.out.println("Error in writing rank stats file");
+		}
+		try {
+			bw.close();
+		} catch (IOException e) {
+			System.out.println("Error in closing rank stats file");
 		}
 	}
 	

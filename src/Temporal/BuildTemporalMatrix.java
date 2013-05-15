@@ -56,7 +56,7 @@ public class BuildTemporalMatrix {
 			HashSet<Integer> visited = new HashSet<Integer>();
 			influencees.add(currentInfluencee);
 			
-			for (; currentLevel <= 3; currentLevel++) { // factor*=0.8
+			for (; currentLevel <= 3; currentLevel++, factor*=1.0) { // factor*=0.8
 				while (influencees.size() > 0) {
 					currentInfluencee = influencees.poll();
 					visited.add(currentInfluencee);
