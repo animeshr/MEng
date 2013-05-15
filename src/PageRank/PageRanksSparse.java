@@ -7,7 +7,7 @@ import java.util.TreeMap;
 
 public class PageRanksSparse {
 	public static final int NumWordsToCompare = 10;
-	public static final int NumUsersToCompare = 20;
+	public static final int NumUsersToCompare = 50;
 	SparseMatrix linkMatrix;
 	ArrayList<Double> w;
 	int linkMatrixSize;
@@ -138,7 +138,7 @@ public class PageRanksSparse {
 			}
 		}
 		for(Integer rank: freqs.keySet()){
-			System.out.println("Rank: " + rank + " => " + freqs.get(rank));
+			System.out.println(rank + " " + freqs.get(rank));
 		}
 	}
 	

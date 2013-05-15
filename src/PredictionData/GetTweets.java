@@ -16,8 +16,8 @@ import com.meng.parsing.xml.Opinion;
 import com.meng.parsing.xml.Opinions;
 
 public class GetTweets {
-	public static final String filepath = "data/bestpic/";
-	public static final int NumFiles = 15;
+	public static final String filepath = "data/anderson/";
+	public static final int NumFiles = 4;
 	ArrayList<UserData> topUserData;
 
 	public GetTweets(TreeMap<Integer, String> topUsers) {

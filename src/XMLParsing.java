@@ -33,6 +33,8 @@ public class XMLParsing {
 	int userIDs;
 	int countAssociations;
 	double timestampSplit;
+	double trainingWeeks;
+	double validationWeeks;
 	static boolean TEMPORAL = true;
 
 	HashMap<Integer, HashMap<Integer, ArrayList<Double>>> associationsTemporal;
@@ -162,7 +164,7 @@ public class XMLParsing {
 		ArrayList<String> tweets = userTweets.get(opinionHolderID);
 		tweets.add(opinion.getSent());
 		userTweets.put(opinionHolderID, tweets);
-		
+
 		if (!users.containsKey(opinionHolderID)) {
 			users.put(opinionHolderID, 1);
 			userToIDFiltered.put(opinionHolderID, userIDs);
@@ -253,6 +255,18 @@ public class XMLParsing {
 	public void findSplitTimestamp(double ratio) {
 		timestampSplit = timestamps
 				.get((int) ((double) (timestamps.size() - 1) * ratio));
+		trainingWeeks = timestamps
+				.get((int) (((double) (timestamps.size() - 1) * ratio) - 1.0))
+				- timestamps.get(0);
+
+		validationWeeks = timestamps.get(timestamps.size() - 1)
+				- timestamps
+						.get((int) (((double) (timestamps.size() - 1) * ratio) - 1.0));
+		
+		trainingWeeks = trainingWeeks / (double)(7 * 24 * 60 * 60);
+		
+		validationWeeks = validationWeeks / (double)(7 * 24 * 60 * 60);
+		
 		System.out.println(timestampSplit + " " + timestamps.size());
 	}
 
@@ -350,7 +364,7 @@ public class XMLParsing {
 	public static void main(String[] args) {
 		XMLParsing temporal = new XMLParsing(TEMPORAL);
 		temporal.readFilesAndFindSplitTime();
-		double trainingPercentage = 0.5;
+		double trainingPercentage = 0.80;
 		temporal.findSplitTimestamp(trainingPercentage);
 		temporal.readFiles();
 		temporal.countUsersOccuringMoreThanOnce();
@@ -395,7 +409,7 @@ public class XMLParsing {
 
 		HashMap<String, Integer> topWords = modelTrain
 				.GetSelectedWords(PageRank.PageRanksSparse.NumWordsToCompare);
-		
+
 		LanguageModel modelRandom = new LanguageModel(temporal.userTweets);
 		HashMap<String, Integer> randomWords = modelRandom
 				.GetSelectedWords(PageRank.PageRanksSparse.NumWordsToCompare);

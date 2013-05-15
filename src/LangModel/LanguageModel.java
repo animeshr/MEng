@@ -104,7 +104,7 @@ public class LanguageModel {
 		} else if (MODE == 2) {
 			return 1;
 		} else {
-			return (1+(int) (Math.log(dataRank)));
+			return (1+(int) (Math.log(rankLimit - dataRank)));
 		}
 	}
 
