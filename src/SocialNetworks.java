@@ -21,7 +21,7 @@ import com.meng.parsing.xml.OhRefs;
 import com.meng.parsing.xml.Opinion;
 import com.meng.parsing.xml.Opinions;
 
-public class XMLParsing {
+public class SocialNetworks {
 
 	HashMap<String, Integer> users;
 	HashMap<String, ArrayList<String>> associations;
@@ -39,7 +39,7 @@ public class XMLParsing {
 
 	HashMap<Integer, HashMap<Integer, ArrayList<Double>>> associationsTemporal;
 
-	XMLParsing(Boolean isTemporal) {
+	SocialNetworks(Boolean isTemporal) {
 		users = new HashMap<String, Integer>();
 		userToIDFiltered = new HashMap<String, Integer>();
 		IDToUserFiltered = new HashMap<Integer, String>();
@@ -362,7 +362,7 @@ public class XMLParsing {
 	}
 
 	public static void main(String[] args) {
-		XMLParsing temporal = new XMLParsing(TEMPORAL);
+		SocialNetworks temporal = new SocialNetworks(TEMPORAL);
 		temporal.readFilesAndFindSplitTime();
 		double trainingPercentage = 0.8;
 		temporal.findSplitTimestamp(trainingPercentage);
