@@ -364,7 +364,7 @@ public class XMLParsing {
 	public static void main(String[] args) {
 		XMLParsing temporal = new XMLParsing(TEMPORAL);
 		temporal.readFilesAndFindSplitTime();
-		double trainingPercentage = 0.80;
+		double trainingPercentage = 0.8;
 		temporal.findSplitTimestamp(trainingPercentage);
 		temporal.readFiles();
 		temporal.countUsersOccuringMoreThanOnce();
@@ -431,7 +431,7 @@ public class XMLParsing {
 
 		LanguageModel modelRandom = new LanguageModel(temporal.userTweets);
 		HashMap<String, Integer> randomWords = modelRandom
-				.GetSelectedWords(PageRank.PageRanksSparse.NumWordsToCompare);
+				.GetSelectedWords(10);//(PageRank.PageRanksSparse.NumWordsToCompare);
 
 		System.out.println("Random words");
 		Double avgInc = 0.0;
